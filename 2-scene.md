@@ -23,6 +23,7 @@
 ![PIXI_Stage.js](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/2/4.jpg "PIXI_Stage.js")
 
 > Pixi.js 使用 WebGL ，是一个超快的 HTML5 2D 渲染引擎。作为一个 Javascript 的 2D 渲染器，Pixi.js 的目标是提供一个快速的、轻量级而且是兼任所有设备的 2D 库。提供无缝 Canvas 回退，支持主流浏览器，包括桌面和移动。 Pixi 渲染器可以开发者享受到硬件加速，但并不需要了解 WebGL。
+> 
 > 来源：[《pixi.js教程中文版--基础篇》](https://www.cnblogs.com/afrog/p/4056378.html)
 
 虽然已经猜到 MV 的跨平台是浏览器包了游戏本体，但是没想到它竟然还用上了 Pixi。上面关于 Pixi 的中文教程短小精悍，可以快速了解到 Pixi 的 stage、renderer、texture、sprite、event 这几个概念，以及它们的关系，推荐先浏览完，再回来继续探索[^2]。
@@ -57,7 +58,7 @@
 
 `updateFade` 只在这个 `update` 方法中被调用。嗯？这个 `update` 有点眼熟。
 
-回到 `SceneManager.requestUpdate` （第 1 节有提到）来:
+回到 `SceneManager.requestUpdate` （第 1 节有提到）来（下图有个方法叫 `requestAnimationFrame`，参考阅读:[深入理解定时器系列第二篇——被誉为神器的requestAnimationFrame](https://www.cnblogs.com/xiaohuochai/p/5777186.html) 和 [window.requestAnimationFrame](https://developer.mozilla.org/zh-CN/docs/Web/API/Window/requestAnimationFrame)）:
 
 ![rpg_manager_SceneManager_requestUpdate.js](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/2/10.jpg "rpg_manager_SceneManager_requestUpdate.js")
 
@@ -107,4 +108,4 @@
 
 [^5]: VSCode 的 `跳转到定义` 的快捷键，很多代码文本编辑器或者 IDE 都有类似的功能。
 
-[^6]: 最后我尝试看了这些方法，发现跟 `Graphics` 这个类有紧密的联系，应该涉及到很多渲染方面的问题；另外，在 `updateMain` 方法中，我们能看到 `requestUpdate` 方法再次出现了。
+[^6]: 最后我尝试看了这些方法，发现跟 `Graphics` 这个类有紧密的联系，应该涉及到很多渲染方面的问题（MV 实际上封装了 pixi，`rpg_core.Graphics` 类有用到 `Pixi.Graphics` 的一些设计思想但没有继承它的原型链，同时加了一些后者没有的特性，比如 fps 计算器；MV 似乎还把自定义绘图放到了其他地方……还得继续探索）；另外，在 `updateMain` 方法中，我们能看到 `requestUpdate` 方法再次出现了。
