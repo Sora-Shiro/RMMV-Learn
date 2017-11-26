@@ -80,7 +80,25 @@
 
 # 还需要探索什么
 
-在 `rpg_core.js` 中，`Bitmap` 和 `Graphics` 的定义是相邻的，而上一节的脚注 6 有提到，`Graphics` 中并没有像 `PIXI.Grapphics` 那样支持各种自定义绘图，那么 `Bitmap` 有吗？这个问题的答案就留到下一节探索解答吧。
+在 `rpg_core.js` 中，`Bitmap` 和 `Graphics` 的定义是相邻的，而上一节的脚注 6 有提到，`Graphics` 中并没有像 `PIXI.Grapphics` 那样支持各种自定义绘图，那么 `Bitmap` 有吗？有，但是很少。
+
+除了上面提到的方法外，`Bitmap` 还有一个叫 `drawCircle` 的直接绘图方法：
+
+![rpg_core_Bitmap_drawCircle.js](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/3/12.jpg "rpg_core_Bitmap_drawCircle.js")
+
+`drawCircle` 仅仅在 `rpg_core.js` 中的 `Weather._createBitmaps` 中有出现。
+
+以及一个 `drawText` 方法：
+
+![rpg_core_Bitmap_drawText.js](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/3/13.jpg "rpg_core_Bitmap_drawText.js")
+
+`drawText` 方法在 MV 所有显示文字的地方都有用到，可以说是使用十分频繁的方法。
+
+读源码真是个十分辛苦的过程，其实从第 1 节走到这里我只是想知道当“开始游戏”这个按钮被按下时发生了什么，以及我应该如何修改界面，甚至是修改战斗系统，但是可能方向不太对，导致学习效率不太理想。
+
+刚好有人给我推荐了一个教程：[【生肉】RPGMakerMV（RMMV）引擎插件-Yanfly Engine Plugins（YEP）系列](https://www.bilibili.com/video/av3174787)，在此十分感谢这位大大。
+
+那么，今后就结合教程和源码来学习吧。
 
 - - -
 
