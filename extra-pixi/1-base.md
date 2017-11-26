@@ -67,4 +67,4 @@ function setup() {
 
 [^1]: Rex van der Spuy - Learn Pixi.js，一本能让人快速入门 Pixi 的书。
 
-[^2]: 之前和一位叫 F.star 的前端工程师兼交互设计师做过一个小游戏（没错就是 [Swipe](https://github.com/Sora-Shiro/Swipe)）。当时他把 psd 设计稿发给我，对我说“开始干活吧切图仔！”。从此以后，在我写程序遇到需要自己处理图片的情况时，在脑海里总会浮现这三个富含调侃的词汇 :)。
+[^2]: 之前和一位叫 F.star 的前端工程师兼交互设计师做过一个小游戏（没错就是 [Swipe](https://github.com/Sora-Shiro/Swipe)）。当时他把 psd 设计稿发给我，对我说“开始干活吧切图仔！”。从此以后，我在写程序遇到需要自己处理图片的情况时，脑海里总会浮现这三个富含调侃的词汇 :)。
