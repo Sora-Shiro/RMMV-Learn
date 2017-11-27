@@ -150,13 +150,13 @@
 
 ![maxGold](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/4/18.jpg "maxGold")
 
-简单粗暴，只是封装了一下 MV 的 API， **重写 `Game_Party.prototype.maxGold` 方法就能设定金币的上限了** ，其他的值上限也是这样的吗？
+简单粗暴，只是封装了一下 MV 的 API， **重写 `Game_Party.prototype.maxGold` 方法就能设定金币的上限了** ，其他的值上限也是这样设定的吗？
 
 我们来看看等级上限的修改：
 
 ![maxLevel](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/4/19.jpg "maxLevel")
 
-这个代码主要逻辑分为三个部分：
+这段代码的逻辑分为三个部分：
 
 第一部分，第一个 `for` 循环的前两句，初始化 `obj` 和 `notedata` 变量。`obj` 其实就是我们在 MV 里的 *数据库 - 角色* 标签页中定义的一个个可操作角色。比如 `group[0]` 得到的就是第 1 个角色（默认叫哈罗尔德的那位）；而 `notedata` 则是你在标签页中设置角色信息时， *备注* 一栏的处理后字符串。
 
@@ -182,7 +182,7 @@
 
 ![drawCurrencyValue](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/4/22.jpg "drawCurrencyValue")
 
-（`Yanfly.Icon.Gold` 是一个整数，是 `https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/system/IconSet.png` 的图标编号，默认的 313 则是那个贴了紫色蒙板的金块图标）
+（`Yanfly.Icon.Gold` 是一个整数，是 `img/system/IconSet.png` 的图标编号，默认的 313 则是那个贴了紫色蒙板的金块图标）
 
 可见关键函数是 `drawIcon`：
 
@@ -190,7 +190,7 @@
 
 这其实就是在切图[^7]啦。
 
-所以， **`Window_Base.drawIcon` 可以用来绘制图标，这个图标的信息存储在 `https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/system/IconSet.png` 中** 。
+所以， **`Window_Base.drawIcon` 可以用来绘制图标，这个图标的信息存储在 `img/system/IconSet.png` 中** 。
 
 至于绘制金币过量时的文字，则在上一张图的 2174 到 2177 行，可见， **`Window_Base.drawText` 可以用来绘制文字** 。
 
@@ -232,7 +232,7 @@
 
 综上所述，这样取消敌方目标的闪烁效果，其实是一种 *trick*，不过这也为我们今后要修改选中效果时提供了一些参考。
 
-**跟选中效果关系紧密的方法：`Sprite_Battler.updateSelectionEffect`、`Sprite_Enemy.updateEffect`** ，这两者的重写可能有一点设计难度 :) 。
+**跟选中效果关系紧密的方法：`Sprite_Battler.updateSelectionEffect`、`Sprite_Enemy.updateEffect`** ，这两者的重写可能有一点设计方面的难度 :) 。
 
 ### 7. 字体相关
 
