@@ -153,23 +153,27 @@ Yanfly 甚至还编写了 3 个扩展的 [文档](https://onedrive.live.com/view
 &lt;speed: +x>|技能、物品|设置速度加成
 &lt;speed: -x>|技能、物品|设置速度反加成
 &lt;Cast Animation: x>|技能|设置施法前摇动画
-&lt;Reflect Animation ID: x>|角色、职业、敌人、武器、防具、状态|设置反射动画[^1]
-&lt;Sprite Cannot Move>|角色、职业、敌人、武器、防具、状态|精灵攻击、施法时无法移动[^1]
-&lt;Anchor Y: y.z>|角色、职业、武器、防具、状态|设置 X 轴的锚点[^2]
-&lt;Anchor Y: y.z>|角色、职业、武器、防具、状态|设置 Y 轴的锚点[^2]
+&lt;Reflect Animation ID: x>|角色、职业、敌人、武器、防具、状态|设置反射动画 *[1]*
+&lt;Sprite Cannot Move>|角色、职业、敌人、武器、防具、状态|精灵攻击、施法时无法移动 *[2]*
+&lt;Anchor Y: y.z>|角色、职业、武器、防具、状态|设置 X 轴的锚点 *[3]*
+&lt;Anchor Y: y.z>|角色、职业、武器、防具、状态|设置 Y 轴的锚点 *[4]*
 &lt;Attack Animation: x>|敌人|设置攻击动画
-&lt;Action Start: x>|状态|设置持续数，单位是剩余行动初始点的次数[^3]
+&lt;Action Start: x>|状态|设置持续数，单位是剩余行动初始点的次数 *[5]*
 &lt;Action Start: x to y>|状态|同上，只是持续数为 x 到 y 之间的一个随机数
-&lt;Action Start: x>|状态|设置持续数，单位是剩余战斗回合初始点的次数[^4]
+&lt;Action Start: x>|状态|设置持续数，单位是剩余战斗回合初始点的次数 *[6]*
 &lt;Action Start: x to y>|状态|同上，只是持续数为 x 到 y 之间的一个随机数
 
-[^1]: 优先级：角色、职业、敌人、武器、防具、状态、默认（即原动画）
+\[1]: 优先级：角色、职业、敌人、武器、防具、状态、默认（即原动画）
 
-[^2]: 优先级：状态、武器、防具、职业、角色、默认
+\[2]: 优先级：角色、职业、敌人、武器、防具、状态、默认（即原动画）
 
-[^3]: Remaining at the start of an action，不太好翻译，
+\[3]: 优先级：状态、武器、防具、职业、角色、默认
 
-[^4]: Remaining at the start of a battle turn
+\[4]: 优先级：状态、武器、防具、职业、角色、默认
+
+\[5]: Remaining at the start of an action，不太好翻译。
+
+\[6]: Remaining at the start of a battle turn
 
 ### 2. 脚本指令表
 
