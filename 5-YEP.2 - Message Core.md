@@ -63,7 +63,9 @@ Yanfly 自定义了一个 `Window_NameBox`，主要用于显示当前消息框�
 
 四个形参很好理解，它们是决定 `window` 的位置和大小的参数；`loadWindowskin` 方法则是读取 `img/system/Window.png` 文件。
 
-第 20 行的 `move` 方法很有意思，我无论怎么找都找不到它的定义在哪里。
+第 20 行的 `move` 方法其实是 MV 自定义类 `Window` 的方法，该方法在 [帮助文档](http://miaowm5.github.io/RMMV-F1/) 的说明中如下：
+
+![move](img/5/16.jpg "move")
 
 `updatePadding` 方法调用了 `standardPadding` 方法，后者返回 18，也就是说默认窗口的内边距是 18 像素；`updateBackOpacity` 方法原理一样，它返回的是 192，也就是默认窗口为半透明；`updateTone` 方法返回 `$gameSystem.windowTone()` 的值。
 
