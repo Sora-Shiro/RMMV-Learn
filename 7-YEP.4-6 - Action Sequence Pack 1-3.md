@@ -18,7 +18,9 @@ Action Sequence 是 Yanfly 大大开发的插件系统，通过它，我们可�
 
 > Each individual aspect of the skill and item effects can be controlled to a degree. 
 
-本节主要从源码的帮助#####@help* 注释出发简述该脚本的功能。
+本节主要从源码的帮助 *@help* 注释出发简述该脚本的功能。
+
+另外，Yanfly 提供了 [在线编辑器](http://actionsequence.cf/) ，它专门用来写动作序列。
 
 ## Action Sequences
 
@@ -114,7 +116,7 @@ Action Sequence Pack 1 主要包括一些视觉上（technical）的扩展，你
 
 ##### ACTION COMMON EVENT
 
-开始公共事件，该公共事件是#####效果* 中的最后一个公共事件。这个事件会阻塞动作列表的执行。
+开始公共事件，该公共事件是 *效果* 中的最后一个公共事件。这个事件会阻塞动作列表的执行。
 
 使用示例：
 - action common event
@@ -562,3 +564,76 @@ Action Sequence Pack 2 主要包括一些视觉上（visual）的扩展，你可
 
 Action Sequence Pack 3 主要包括一些视觉上（visual）的扩展，你可以用它来操作镜头和画面缩放。
 
+##### CAMERA CLAMP ON
+##### CAMERA CLAMP OFF
+
+是否夹紧镜头，默认为是，这样镜头平移就不会超出战斗背景的边界。即使关闭了该功能，在每次的 perform finish 动作以后会被重置。
+
+##### CAMERA FOCUS: target, FRONT BASE, (frames)
+##### CAMERA FOCUS: target, BASE, (frames)
+##### CAMERA FOCUS: target, BACK BASE, (frames)
+##### CAMERA FOCUS: target, FRONT CENTER, (frames)
+##### CAMERA FOCUS: target, CENTER, (frames)
+##### CAMERA FOCUS: target, BACK CENTER, (frames)
+##### CAMERA FOCUS: target, FRONT HEAD, (frames)
+##### CAMERA FOCUS: target, HEAD, (frames)
+##### CAMERA FOCUS: target, BACK HEAD, (frames)
+
+将镜头聚焦于目标，默认为 CENTER。镜头不会超过画面边界。
+
+#####  CAMERA OFFSET: LEFT, distance
+#####  CAMERA OFFSET: RIGHT, distance
+#####  CAMERA OFFSET: UP, distance
+#####  CAMERA OFFSET: DOWN, distance
+
+使镜头偏移（offset）。
+
+#####  CAMERA PAN: LEFT, distance, (frames)
+#####  CAMERA PAN: RIGHT, distance, (frames)
+#####  CAMERA PAN: UP, distance, (frames)
+#####  CAMERA PAN: DOWN, distance, (frames)
+
+使镜头平移。`frames` 默认为 30。镜头不会超过画面边界。
+
+##### CAMERA SCREEN: TOP LEFT, (frames)
+##### CAMERA SCREEN: FAR LEFT, (frames)
+##### CAMERA SCREEN: BOTTOM LEFT, (frames)
+##### CAMERA SCREEN: TOP CENTER, (frames)
+##### CAMERA SCREEN: CENTER, (frames)
+##### CAMERA SCREEN: BOTTOM CENTER, (frames)
+##### CAMERA SCREEN: TOP RIGHT, (frames)
+##### CAMERA SCREEN: FAR RIGHT, (frames)
+##### CAMERA SCREEN: BOTTOM RIGHT, (frames)
+##### CAMERA SCREEN: POINT, x, y, (frames)
+##### CAMERA SCREEN: target, FRONT, (frames)
+##### CAMERA SCREEN: target, BASE, (frames)
+##### CAMERA SCREEN: target, BACK, (frames)
+##### CAMERA SCREEN: target, FRONT CENTER, (frames)
+##### CAMERA SCREEN: target, CENTER, (frames)
+##### CAMERA SCREEN: target, BACK CENTER, (frames)
+##### CAMERA SCREEN: target, FRONT TOP, (frames)
+##### CAMERA SCREEN: target, TOP, (frames)
+##### CAMERA SCREEN: target, BACK TOP, (frames)
+
+移动镜头至目标的指定位置。`frames` 默认为 30。镜头不会超过画面边界。
+
+##### RESET CAMERA: (frames)
+
+重置镜头。镜头不会超过画面边界。
+
+##### RESET ZOOM: (frames)
+
+仅对 SideView 有效。重置缩放。镜头不会超过画面边界。
+
+##### WAIT FOR CAMERA
+
+等待镜头平移完成。
+
+##### WAIT FOR ZOOM
+
+等待缩放完成。
+
+##### ZOOM: x%, (frames)
+##### ZOOM: x.y, (frames)
+
+缩放指定数值。

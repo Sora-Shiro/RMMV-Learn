@@ -137,7 +137,7 @@
 
 Action Sequences，动作序列，通过在备注里写下它，就可以实现很多丰富的功能。
 
-Yanfly 甚至还编写了 3 个扩展的 [文档](https://onedrive.live.com/view.aspx?cid=5b384122eea0ef60&page=view&resid=5B384122EEA0EF60!1566&parId=5B384122EEA0EF60!131&authkey=!ADifjezQXuL8DSg&app=Word) 和 [编辑器](http://actionsequence.cf/)，翻译它们将是一项艰巨的工作。
+Yanfly 甚至还编写了 3 个扩展的 [文档](https://onedrive.live.com/view.aspx?cid=5b384122eea0ef60&page=view&resid=5B384122EEA0EF60!1566&parId=5B384122EEA0EF60!131&authkey=!ADifjezQXuL8DSg&app=Word) 和 [编辑器](http://actionsequence.cf/) 。
 
 - - -
 
