@@ -209,7 +209,7 @@ Action Sequence Pack 1 主要包括一些视觉上（technical）的扩展，你
 ##### CHANGE VARIABLE X = Y
 ##### CHANGE VARIABLE X += Y
 ##### CHANGE VARIABLE X -= Y
-##### CHANGE VARIABLE X#####= Y
+##### CHANGE VARIABLE X *= Y
 ##### CHANGE VARIABLE X /= Y
 ##### CHANGE VARIABLE X %= Y
 
@@ -219,7 +219,7 @@ Action Sequence Pack 1 主要包括一些视觉上（technical）的扩展，你
 - change variable 1 = 2
 - change variable 3 += 4
 - change variable 5 -= 6
-- change variable 7#####= 8
+- change variable 7 *= 8
 - change variable 9 /= 10
 - change variable 11 %= 12
 
