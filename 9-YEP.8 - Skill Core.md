@@ -1,0 +1,180 @@
+> 版本：v1.12
+>
+> 国内视频地址：[Bilibili - YEP.8 – Skill Core](https://www.bilibili.com/video/av3174787/#page=13)
+>
+> 原地址：[yanfly.moe - YEP.8 – Skill Core](http://yanfly.moe/2015/10/13/yep-8-skill-core/)
+> 
+> 推荐将原地址的 [主页](http://yanfly.moe/yep/) 保存下来，作者 Yanfly 会一直保持脚本的更新。
+> 
+> 脚本源码地址可以在每个原地址网页中找到。本节的脚本源码在 [这里](https://www.dropbox.com/s/0k4pwh2q45xrjjh/YEP_SkillCore.js?dl=0)。
+
+# 脚本功能概述
+
+本脚本主要扩展了技能的消耗和效果功能。
+
+# 脚本可设置参数
+
+1. General
+
+- Cost Padding，如果一个技能有多种消耗，这是不同消耗文本之间的间距像素值。
+- Command Alignment，在技能类型窗口里文本的对齐方式。
+- Window Columns，调整技能窗口的列数。
+
+2. HP Costs
+
+- HP Format，调整消耗 HP 文本的格式。
+- HP Font Size，调整显示消耗 HP 文本的字号。
+- HP Text Color，调整消耗 HP 文本的颜色。
+- HP Icon，调整消耗 HP 的图标。
+
+3. MP Costs
+
+- MP Format，调整消耗 MP 文本的格式。
+- MP Font Size，调整显示消耗 MP 文本的字号。
+- MP Text Color，调整消耗 MP 文本的颜色。
+- MP Icon，调整消耗 MP 的图标。
+
+4. TP Costs
+
+- TP Format，调整消耗 TP 文本的格式。
+- TP Font Size，调整显示消耗 TP 文本的字号。
+- TP Text Color，调整消耗 TP 文本的颜色。
+- TP Icon，调整消耗 TP 的图标。
+
+# Lunatic Mode 疯狂模式
+
+疯狂模式拥有更多的扩展功能，主要通过备注信息实现。
+
+### 1. Skill Costs 技能消耗
+
+```
+<Custom HP Cost>
+    code
+    code
+</Custom HP Cost>
+
+<Custom MP Cost>
+    code
+    code
+</Custom HP Cost>
+
+<Custom TP Cost>
+    code
+    code
+</Custom HP Cost>
+
+Example:
+<Custom HP Cost>
+    code = 1000;
+</Custom HP Cost>
+```
+
+### 2. Custom Show Requirements 技能出现要求
+
+示例（50 级以后该技能不再出现）：
+
+```
+<Custom Show Eval>
+    if (user.level < 50) {
+        visible = true;
+    } else {
+        visible = false;
+    }
+</Custom Show Eval>
+```
+
+### 3. Custom Requirements 技能使用要求
+
+示例（没有 1000 金钱无法使用）：
+```
+<Custom Requirement>
+    if ($gameParty.gold() > 1000) {
+        value = true;
+    } else {
+        value = false;
+    }
+</Custom Requirement>
+```
+
+### 4. Custom Execution 技能发动事件（处理消耗）
+
+```
+<Custom Execution>
+    $gameParty.loseGold(1000);
+</Custom Execution>
+```
+
+### 5. Custom Cost Display
+
+```
+这个备注信息运行于 **显示** 技能消耗之前。
+<Cost Display Eval>
+    var variableId = 1;
+    var value = 1000;
+    $gameVariables.setValue(variableId, value);
+</Cost Display Eval>
+```
+
+```
+这个备注信息用于显示技能消耗，你能在这里使用控制字符。
+<Custom Cost Display>
+\c[4]\v[1]\c[0] Gold
+</Custom Cost Display>
+```
+
+### 6. The Skill Phases
+
+**本部分的备注信息不仅能作用于技能，还能作用于物品** 。
+一个技能或物品的使用会经过多个阶段：
+
+Before Effect Phase (influenced by this plugin)
+if skill successfully lands:
+    - Pre-Damage Effect Phase (influenced by this plugin)
+    - Damage Phase
+    - Post-Damage Effect Phase (influenced by this plugin)
+    - Item Trait Effects Phase
+After Effect Phase (influenced by this plugin)
+
+有四个阶段我们能通过本脚本影响，其中有两个脚本影响的前提是技能或物品成功使用到目标身上（land）。
+
+```
+<Before Eval>
+    code
+    code
+</Before Eval>
+<Pre-Damage Eval>
+    code
+    code
+</Pre-Damage Eval>
+<Post-Damage Eval>
+    code
+    code
+</Post-Damage Eval>
+<After Eval>
+    code
+    code
+</After Eval>
+```
+
+`<Pre-Damage Eval>` 和 `<Post-Damage Eval>` 中可以使用预定义变量 `value`，就像第一小节的示例一样，它们会被返回，用于伤害计算。
+
+
+# 附录：备注信息表
+
+备注信息|可作用范围|功能
+:-:|:-:|:-:
+&lt;HP Cost: x>|技能|消耗值为 x 的 HP
+&lt;HP Cost: x%>|技能|消耗 x% 的 HP
+&lt;MP Cost: x>|技能|消耗值为 x 的 MP
+&lt;MP Cost: x%>|技能|消耗 x% 的 MP
+&lt;TP Cost: x>|技能|消耗值为 x 的 TP
+&lt;TP Cost: x%>|技能|消耗 x% 的 TP
+&lt;Hide in Battle>|技能|战斗中隐藏并无法使用
+&lt;Hide in Field>|技能|战斗外隐藏并无法使用
+&lt;Hide if Learned Skill: x>|技能|如果习得了第 x 号技能，隐藏
+&lt;Hide if Learned Skill: x, x, x>|技能|如果习得了任意 x 号技能，隐藏
+&lt;Hide if Learned Skill: x to y>|技能|如果习得了 x 至 y 号技能，隐藏
+&lt;Swap Gauge x: y>|职业|使 x （取值范围 1、2、3）条状态条替换为 y （取值 HP、MP、TP、Nothing 或 Null）种状态条
+&lt;Swap Gauge x: y>|武器、防具、状态|用法同上 *[1]*
+
+\[1]: 优先级：武器、防具、状态、职业、敌人
