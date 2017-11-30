@@ -1,0 +1,136 @@
+> 版本：v1.12
+>
+> 国内视频地址：[Bilibili - YEP.9 - Skill Cooldowns](https://www.bilibili.com/video/av3174787/#page=14)
+>
+> 原地址：[yanfly.moe - YEP.9 - Skill Cooldowns](http://yanfly.moe/2015/10/14/yep-9-skill-cooldowns/)
+> 
+> 推荐将原地址的 [主页](http://yanfly.moe/yep/) 保存下来，作者 Yanfly 会一直保持脚本的更新。
+> 
+> 脚本源码地址可以在每个原地址网页中找到。本节的脚本源码在 [这里](https://www.dropbox.com/s/fzftb14r1t1t9yh/YEP_X_SkillCooldowns.js?dl=0)。
+
+# 脚本功能概述
+
+本脚本需要 `YEP_SkillCore.js` 支持。
+
+本脚本主要用于为技能添加冷却时间。
+
+# 脚本可设置参数
+
+1. Cooldown
+
+- Cooldown Format，冷却时间文本格式
+- Cooldown Font Size，文本字号
+- Cooldown Text Color，文本颜色
+- Cooldown Icon，用于表示冷却的图标
+- Cooldown After Battle，设置战斗结束后技能冷却能改变多少
+- Cooldown Steps，设置在地图上走多少步才能减少 1 冷却回合
+- Cooldown Bypass，无法进入冷却的技能编号，如攻击、防御
+
+2. Warmup
+
+技能热身，指战斗开始时技能无法使用，经过一定回合数后才可以使用。
+
+技能热身与技能冷却不叠加计算，但也不互相覆盖，而是并行处理，即一个技能能被使用的前提条件是热身完毕且不处于冷却状态。
+
+- Warmup Format，技能热身文本格式
+- Warmup Font Size，文本字号
+- Warmup Text Color，文本颜色
+- Warmup Icon，用于表示热身的图标
+
+3. Battle Core
+
+- Time Based，如果战斗系统是 Tick-based，使用时间代替回合来计算冷却时间
+- Turn Time，设置多少 ticks 等于 1 回合
+
+# Lunatic Mode 疯狂模式
+
+疯狂模式拥有更多的扩展功能，主要通过备注信息实现。
+
+### Specialized Cooldowns
+
+本小节的备注信息仅能作用于技能。
+
+```
+<Cooldown Eval>
+    cooldown = x;
+    cooldown += x;
+</Cooldown Eval>
+
+<Warmup Eval>
+    warmup = x;
+    warmup += x;
+</Warmup Eval>
+```
+
+# Action Sequence 动作序列
+
+本功能需要 `YEP_BattleEngineCore.js` 支持。
+
+##### SKILL X COOLDOWN: targets, +Y
+##### SKILL X COOLDOWN: targets, -Y
+##### SKILL X COOLDOWN: targets, Y
+
+调整目标 x 号技能的冷却回合。
+
+##### SKILL TYPE X COOLDOWN: targets, +Y
+##### SKILL TYPE X COOLDOWN: targets, -Y
+##### SKILL TYPE X COOLDOWN: targets, Y
+
+调整目标 Skill Type 为 x 的技能的冷却回合。
+
+##### GLOBAL COOLDOWN: targets, +X
+##### GLOBAL COOLDOWN: targets, -X
+##### GLOBAL COOLDOWN: targets, X
+
+调整目标所有技能的冷却回合。
+
+优先级：SKILL > SKILL TYPE > GLOBAL
+
+需要注意的是，如果一个技能已经在冷却中，再次尝试冷却该技能（而不是增加或减少），技能会取当前冷却数和申请数中较大者。
+
+# 附录：备注信息表
+
+备注信息|可作用范围|功能
+:-:|:-:|:-:
+&lt;Cooldown: x>|技能|冷却 x 回合，优先级高于 Skill Type 和 Global
+&lt;Warmup: x|技能|热身 x 回合
+&lt;After Battle Cooldown: +x>|技能|在战斗结束后，增加技能冷却回合
+&lt;After Battle Cooldown: -x>|技能|在战斗结束后，减少技能冷却回合
+&lt;Cooldown Steps: x>|技能|在战斗以外，x 步能减少 1 技能冷却回合
+&lt;Skill x Cooldown: y>|技能|使用该技能后，第 x 号技能也会冷却 y 回合，优先级高于 Skill Type 和 Global
+&lt;Skill name Cooldown: y>|技能|使用该技能后，名为 name 的技能也会冷却 y 回合，优先级高于 Skill Type 和 Global
+&lt;SType x Cooldown: y>|技能|使用该技能后，所有 SType 为 x 的技能也会冷却 y 回合，优先级高于 Global
+&lt;Global Cooldown: x>|技能|使用该技能后，所有在战斗者技能列表里的技能将会冷却 x 回合
+&lt;Bypass Cooldown>|技能|使用该 tag 的技能不会被冷却
+&lt;Skill x Cooldown: +y>|技能、物品|目标被命中后将会使 **目标的** x 号技能的冷却回合增加 y
+&lt;Skill x Cooldown: -y>|技能、物品|目标被命中后将会使目标的 x 号技能的冷却回合减少 y
+&lt;Skill name Cooldown: +y>|技能、物品|目标被命中后将会使目标的 x 名技能的冷却回合增加 y
+&lt;Skill name Cooldown: -y>|技能、物品|目标被命中后将会使目标的 x 名技能的冷却回合减少 y
+&lt;SType x Cooldown: +y>|技能、物品|目标被命中后将会使目标的 Stype 为 x 的技能的冷却回合增加 y
+&lt;SType x Cooldown: -y>|技能、物品|目标被命中后将会使目标的 Stype 为 x 的技能的冷却回合减少 y
+&lt;Global Cooldown: +x>|技能、物品|目标被命中后将会使目标的所有技能冷却回合增加 y
+&lt;Global Cooldown: -x>|技能、物品|目标被命中后将会使目标的所有技能冷却回合减少 y
+&lt;Skill x Cooldown Duration: y%>|角色、职业、敌人、武器、防具、状态|改变第 x 号技能的冷却时间为 y%
+&lt;Skill name Cooldown Duration: y%>|角色、职业、敌人、武器、防具、状态|改变 x 名技能的冷却时间为 y%
+&lt;SType x Cooldown Duration: y%>|角色、职业、敌人、武器、防具、状态|改变 Stype 为 x 的技能的冷却时间为 y%
+&lt;Global Cooldown Duration: x%>|角色、职业、敌人、武器、防具、状态|改变所有技能的冷却时间为 y%
+&lt;Skill x Cooldown Rate: y%>|角色、职业、敌人、武器、防具、状态|改变第 x 号技能的冷却速度为 y%
+&lt;Skill name Cooldown Rate: y%>|角色、职业、敌人、武器、防具、状态|改变 x 名技能的冷却速度为 y%
+&lt;SType x Cooldown Rate: y%>|角色、职业、敌人、武器、防具、状态|改变 Stype 为 x 的技能的冷却速度为 y%
+&lt;Global Cooldown Rate: x%>|角色、职业、敌人、武器、防具、状态|改变所有技能的冷却速度为 y%
+&lt;Skill x Cooldown: +y>|角色、职业、敌人、武器、防具、状态|增加第 x 号技能的冷却时间，这个计算在 duration 和 rate 计算之后
+&lt;Skill x Cooldown: -y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Skill name Cooldown: +y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Skill name Cooldown: -y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;SType x Cooldown: +y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;SType x Cooldown: -y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Global Cooldown: +x>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Global Cooldown: -x>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Skill x Warmup: +y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Skill x Warmup: -y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Skill name Warmup: +y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Skill name Warmup: -y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;SType x Warmup: +y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;SType x Warmup: -y>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Global Warmup: +x>|角色、职业、敌人、武器、防具、状态|参考上面说明
+&lt;Global Warmup: -x>|角色、职业、敌人、武器、防具、状态|参考上面说明
