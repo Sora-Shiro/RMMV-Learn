@@ -1,0 +1,564 @@
+> 版本依次为：v1.12、v1.12、v1.04
+>
+> 国内视频地址依次为：
+> - [Bilibili - YEP.4 – Action Sequence Pack 1](https://www.bilibili.com/video/av3174787/#page=9)
+> - [Bilibili - YEP.5 - Action Sequence Pack 2](https://www.bilibili.com/video/av3174787/#page=10)
+> - [Bilibili - YEP.6 - Action Sequence Pack 3](https://www.bilibili.com/video/av3174787/#page=11)
+>
+> 原地址依次为：
+> - [yanfly.moe - YEP.4 – Action Sequence Pack 1](http://yanfly.moe/2015/10/11/yep-4-action-sequence-pack-1/)
+> - [yanfly.moe - YEP.5 – Action Sequence Pack 2](http://yanfly.moe/2015/10/12/yep-5-action-sequence-pack-2/)
+> - [yanfly.moe - YEP.6 – Action Sequence Pack 3](http://yanfly.moe/2015/10/12/yep-6-action-sequence-pack-3/)
+> 
+> 脚本源码地址可以在每个原地址网页中找到。
+
+# 脚本功能概述
+
+Action Sequence 是 Yanfly 大大开发的插件系统，通过它，我们可以：
+
+> Each individual aspect of the skill and item effects can be controlled to a degree. 
+
+本节主要从源码的帮助#####@help* 注释出发简述该脚本的功能。
+
+## Action Sequences
+
+每一个技能和物品都由 5 个不同的动作序列：
+
+1. Setup Actions
+
+    这个动作系发生在战斗者做出主要动作和技能效果前，可以说是准备动作系。常见的准备动作系有战斗者向前移动了一些、拔出武器。这个步骤会出现在战斗者释放他们的技能或者使用物品之前。
+
+2. Whole Actions
+
+    这个动作系会同时影响到所有目标。虽然这个部分没有必要被使用，但是绝大多数动作会在这里展示，作用于所有目标的动画。这个动作系发生在技能或物品消耗之后。
+
+3. Target Actions
+
+    这个动作系会分别影响到所有目标。除非特别安排，这个动作系不会影响到其他目标。
+
+4. Follow Actions
+
+    这个动作系是 Target Actions 的后续动作。常用来处理去除不死状态（见上一节笔记）、开始公共事件等。
+
+5. Finish Actions
+
+    这个动作系意味着战斗者结束他的战斗序列。常用来等待之前的动画处理完成、移动回原来的位置等。
+
+以下是在备注里应该排列的动作系顺序：
+```
+<setup action>
+</setup action>
+
+<whole action>
+</whole action>
+
+<target action>
+</target action>
+
+<follow action>
+</follow action>
+
+<finish action>
+</finish action>
+```
+
+如果需要复制某个备注，那么使用 `<action copy: x:y>`，其中 x 是 `item` 或 `skill`，y 是对应的 ID。
+
+## Target Typing
+
+以下是在之后介绍的动作列表中，可以代替 (target) 形参的可选字符串值表
+
+目标字符串|选择结果
+:-:|:-:
+user|当前战斗者
+target, targets|技能、物品默认目标
+actors, existing actors|所有存活角色
+all actors|所有角色
+dead actors|所有死亡角色
+actors not user|除 user 外的所有存活角色
+actor x|第 x 号（slot of x）角色
+character x|角色 ID 为 x 的角色
+enemies, existing enemies|所有存活敌军
+all enemies|所有敌军
+dead enemies|所有死亡敌军
+enemies not user|除 user 外的所有存活敌军
+enemy x|第 x 号敌军
+friends|所有存活友军
+all friends|所有友军
+dead friends|所有死亡友军
+friends not user|除 user 外的所有存活友军
+friend x|第 x 号友军
+opponents|所有存活对手
+all opponents|所有对手
+dead opponents|所有死亡对手
+opponet x|第 x 号对手
+all alive|所有存活角色和敌军
+all members|所有角色和敌军
+all dead|所有死亡角色和敌军
+all not user|除 user 外所有存活角色和敌军
+focus|战斗者和他的目标
+not focus|除战斗者和他的目标以外的所有人
+
+## 1. Action Sequence Pack 1 动作列表 Action List
+
+Action Sequence Pack 1 主要包括一些视觉上（technical）的扩展，你可以用它改变开关、操作变量、添加状态、改变伤害等等。
+
+##### ACTION ANIMATION: (target), (mirror)
+
+默认根据技能、物品的默认作用目标播放动画。`mirror` 参数用于镜像动画。
+
+使用示例：
+- action animation
+- action animation: target
+- action animation: user, mirror
+
+##### ACTION COMMON EVENT
+
+开始公共事件，该公共事件是#####效果* 中的最后一个公共事件。这个事件会阻塞动作列表的执行。
+
+使用示例：
+- action common event
+
+##### ACTION EFFECT: target
+
+对目标造成实际伤害/治疗/状态效果（即在图形界面中定义好的技能、物品效果），这是关键动作。
+
+使用示例：
+- action effect
+
+##### ADD stat BUFF: target, (turns), (show)
+
+加成目标相应属性（`stat` 可取值：hp', 'mp', 'atk', 'def', 'mat', 'mdf', 'agi', 'luk'），`turns` 决定持续的回合数，`show` 会使属性加成显示在战斗日志（battle log）中。
+
+使用示例：
+- add atk buff: user, 3, show
+- add def buff: target, 8
+
+##### ADD stat DEBUFF: target, (turns), (show)
+
+反加成目标相应属性，用法同上。
+
+##### ADD STATE X: target, (show)
+
+给目标添加 X 号状态，`show` 会使，与，通过这个动作添加的状态，相关的消息显示。
+
+使用示例：
+- add state 5: target
+
+##### ADD STATE X, Y, Z: target, (show)
+
+同上，不过这可以一次性添加三种状态
+
+##### ANIMATION X: target, (mirror)
+
+对目标播放第 X 号动画，`mirror` 会镜像播放。
+
+使用示例：
+- animation 5: user
+
+##### ANIMATION WAIT: X
+
+等待 X 帧动画
+
+##### BGM: STOP
+##### BGM: MEMORIZE
+##### BGM: MEMORY
+##### BGM: filename, (volume), (pitch), (pan)
+
+控制背景音乐播放。
+
+`BGM: MEMORIZE` 会记忆当前背景音乐，`BGM: MEMORY` 则会重新播放上次记忆的背景音乐。
+
+`filename` 参数不需要文件的扩展名。
+
+第四种动作指令的三个参数默认从脚本可设置的三个参数中取值。
+
+##### BGS: STOP
+##### BGS: MEMORIZE
+##### BGS: MEMORY
+##### BGS: filename, (volume), (pitch), (pan)
+
+控制背景音效播放。其余同上。
+
+##### BREAK ACTION
+
+中止动作序列（仅对当前动作系有效）。
+
+##### CAST ANIMATION
+
+播放施法前摇动画。在普通攻击和使用物品时无效。
+
+##### CLEAR BATTLE LOG
+
+清除战斗日志
+
+##### CHANGE SWITCH X: on/off/toggle/switch z
+##### CHANGE SWITCH X..Y: on/off/toggle/switch z
+##### CHANGE SWITCH X TO Y: on/off/toggle/switch z
+
+改变游戏开关：打开、关闭、切换、与开关 z 相同
+
+使用示例：
+- change switch 1: on
+- change switch 2..4: off
+- change switch 5 to 8: toggle
+- change switch 9: switch 5
+
+##### CHANGE VARIABLE X = Y
+##### CHANGE VARIABLE X += Y
+##### CHANGE VARIABLE X -= Y
+##### CHANGE VARIABLE X#####= Y
+##### CHANGE VARIABLE X /= Y
+##### CHANGE VARIABLE X %= Y
+
+改变变量 X 的值，Y 可以是整型值或一段代码
+
+使用示例：
+- change variable 1 = 2
+- change variable 3 += 4
+- change variable 5 -= 6
+- change variable 7#####= 8
+- change variable 9 /= 10
+- change variable 11 %= 12
+
+##### COLLAPSE: target, (force)
+
+如果目标在此时将要死亡，这个动作会使游戏在目标 HP 为 0 时杀死目标。如果你想强制令目标死亡，使用 `force` 参数
+
+使用示例：
+- collapse: user
+- collapse: target, force
+
+##### COMMON EVENT: X
+
+开始第 X 号公共事件。这个事件会阻塞动作列表的执行。
+
+##### DEATH BREAK
+
+如果使用者在技能使用期间死亡（如被物理反击、魔法反射），当前动作系的剩余动作都不会被执行。
+
+##### DISPLAY ACTION
+
+在战斗日志最上方显示动作名称，它会一直存在直到战斗日志被清空。
+
+##### EVAL: code
+
+执行 JavaScript 代码。
+
+使用示例：
+- eval: $gameParty.loseItem($dataItems[3], 10)
+
+##### GAIN ITEM X: Y
+##### LOSE ITEM X: Y
+##### GAIN WEAPON X: Y
+##### LOSE WEAPON X: Y
+##### GAIN ARMOR X: Y
+##### LOSE ARMOR X: Y
+
+队伍将会获取/失去 Y 个第 X 号物品、武器、防具，Y 默认是 1。
+
+使用示例：
+- gain item 1: 20
+- lose weapon 2
+- gain armor 3: 50
+
+##### GOLD +x
+##### GOLD -x
+
+队伍增减金钱。
+
+##### IF ... ELSE STATEMENTS
+
+分支语句块。缩进不是必须的。
+
+使用示例：
+```
+if $gameSwitches.value(1)
+        action effect
+    else if $gameSwitches.value(2)
+        action effect
+        action effect
+    else
+        action effect
+        action effect
+        action effect
+    end
+```
+
+##### IMMORTAL: targets, true/false
+
+设置目标是否不死。这能保证 action effect 完整作用。
+
+##### HP +X: target, (show)
+##### HP -X: target, (show)
+##### HP +X%: target, (show)
+##### HP -X%: target, (show)
+##### HP +VARIABLE X: target, (show)
+##### HP -VARIABLE X: target, (show)
+##### HP +VARIABLE X%: target, (show)
+##### HP -VARIABLE X%: target, (show)
+
+改变 HP，`show` 会使变化信息显示在战斗日志中。
+
+##### ME: STOP
+##### ME: filename, (volume), (pitch), (pan)
+
+控制 ME 播放。
+
+##### MOTION WAIT: target
+
+如果目标正在执行某一个动作，等待 12 帧。
+
+##### MP +X: target, (show)
+##### MP -X: target, (show)
+##### MP +X%: target, (show)
+##### MP -X%: target, (show)
+##### MP +VARIABLE X: target, (show)
+##### MP -VARIABLE X: target, (show)
+##### MP +VARIABLE X%: target, (show)
+##### MP -VARIABLE X%: target, (show)
+
+改变 MP。
+
+##### PERFORM ACTION
+
+让战斗者向前移动一点，并挥舞他们的武器、或者做刺杀动作，但具体如何由游戏自动决定。
+
+##### PERFORM FINISH
+
+让战斗者移动至原位。
+
+##### PERFORM START
+
+让战斗者从原位向前移动一点。
+
+##### REFRESH STATUS
+
+刷新状态窗口。
+
+##### REMOVE stat BUFF: target, (show)
+
+移除属性加成。`stat` 可以取以下值：'hp', 'mp', 'atk', 'def', 'mat', 'mdf', 'agi', 'luk'
+
+##### REMOVE stat DEBUFF: target, (show)
+
+移除属性反加成。
+
+##### REMOVE STATE X: target (show)
+##### REMOVE STATE X, Y, Z: target (show)
+
+移除第 X，Y，Z 号状态
+
+##### SE: filename, (volume), (pitch), (pan)
+##### SE: PLAY OK
+##### SE: PLAY CURSOR
+##### SE: PLAY CANCEL
+##### SE: PLAY BUZZER
+##### SE: PLAY EQUIP
+##### SE: PLAY SAVE
+##### SE: PLAY LOAD
+##### SE: PLAY BATTLE START
+##### SE: PLAY ESCAPE
+##### SE: PLAY ENEMY ATTACK
+##### SE: PLAY ENEMY DAMAGE
+##### SE: PLAY ENEMY COLLAPSE
+##### SE: PLAY BOSS COLLAPSE 1
+##### SE: PLAY BOSS COLLAPSE 2
+##### SE: PLAY ACTOR DAMAGE
+##### SE: PLAY ACTOR COLLAPSE
+##### SE: PLAY RECOVERY
+##### SE: PLAY MISS
+##### SE: PLAY EVASION
+##### SE: PLAY MAGIC EVASION
+##### SE: PLAY REFLECTION
+##### SE: PLAY SHOP
+##### SE: PLAY USE ITEM
+##### SE: PLAY USE SKILL
+
+控制 SE 播放。
+
+##### TP +X: target, (show)
+##### TP -X: target, (show)
+##### TP +X%: target, (show)
+##### TP -X%: target, (show)
+##### TP +VARIABLE X: target, (show)
+##### TP -VARIABLE X: target, (show)
+##### TP +VARIABLE X%: target, (show)
+##### TP -VARIABLE X%: target, (show)
+
+改变 TP。
+
+##### WAIT: frames
+
+等待 frames 帧
+
+##### WAIT FOR ANIMATION
+
+等待所有动画播放完成。
+
+##### WAIT FOR EFFECT
+
+等待所有效果影响完成。
+
+##### WAIT FOR MOVEMENT
+
+等待所有战斗者移动完成。
+
+##### WAIT FOR NEW LINE
+
+等待日志窗口新的一行被显示出来。
+
+##### WAIT FOR POPUPS
+
+等待所有 popups 显示完成（如连击结算时伤害值的显示）。
+
+## 2. Action Sequence Pack 2 动作列表 Action List
+
+Action Sequence Pack 2 主要包括一些视觉上（visual）的扩展，你可以用它来更丰富地展示战斗者的可视化动作。
+
+##### ATTACK ANIMATION: target, (mirror)
+
+让目标展示攻击动画，取决于战斗者当前持有的武器。
+
+##### ENEMY EFFECT: target, effect-type
+
+这仅对敌军有效。使敌人出现 *whiten* 效果或 *blink* 效果。
+
+使用示例：
+- enemy effect: targets, whiten
+- enemy effect: targets, blink
+
+##### FACE target1: FORWARD
+##### FACE target1: BACKWARD
+##### FACE target1: HOME
+##### FACE target1: AWAY FROM HOME
+##### FACE target1: POINT, x coordinate, y coordinate
+##### FACE target1: AWAY FROM POINT, x coordinate, y coordinate
+##### FACE target1: target2
+##### FACE target1: AWAY FROM target2
+
+改变 `target1` 的朝向。
+
+##### FADE OUT: (frames)
+##### FADE IN: (frames)
+
+使画面淡入淡出 `frames` 帧，默认为 60。
+
+##### FLASH SCREEN: WHITE, (frames)
+##### FLASH SCREEN: RED, (frames)
+##### FLASH SCREEN: ORANGE, (frames)
+##### FLASH SCREEN: YELLOW, (frames)
+##### FLASH SCREEN: GREEN, (frames)
+##### FLASH SCREEN: BLUE, (frames)
+##### FLASH SCREEN: PURPLE, (frames)
+##### FLASH SCREEN: MAGENTA, (frames)
+##### FLASH SCREEN: BLACK, (frames)
+##### FLASH SCREEN: (red), (green), (blue), (intensity), (frames)
+
+使画面闪烁，闪烁颜色可使用预设值也可自定义，`frames` 默认为 60。
+
+使用示例：
+- flash screen: white
+- flash screen: red, 45
+- flash screen: 128, 170, 214, 170
+- flash screen: 68, 68, 68, 170, 45
+
+##### FLOAT target: (height), (frames)
+##### FLOAT target: (height%), (frames)
+
+仅 SideView 战斗模式有效。使目标漂浮。`height%` 的值取决于目标的高度，如 100% 意味着目标与地面的距离刚好为他的高度。
+
+使用示例：
+- Usage Example: float user: 200%
+- float enemies: 500, 30
+- float target: 0%, 30
+
+##### HIDE BATTLE HUD
+##### SHOW BATTLE HUD
+
+显示/隐藏 battle hud （就是默认在下方的战斗控制查看窗口）。
+
+##### JUMP target: (height), (frames)
+##### JUMP target: (height%), (frames)
+
+仅 SideView 战斗模式有效。使目标跳跃。
+
+##### MOTION WALK: target
+##### MOTION STANDBY: target
+##### MOTION CHANT: target
+##### MOTION GUARD: target
+##### MOTION DAMAGE: target
+##### MOTION EVADE: target
+##### MOTION ATTACK: target
+##### MOTION THRUST: target
+##### MOTION SWING: target
+##### MOTION MISSILE: target
+##### MOTION SKILL: target
+##### MOTION SPELL: target
+##### MOTION ITEM: target
+##### MOTION ESCAPE: target
+##### MOTION VICTORY: target
+##### MOTION DYING: target
+##### MOTION ABNORMAL: target
+##### MOTION SLEEP: target
+##### MOTION DEAD: target
+
+仅 SideView 战斗模式有效。使目标执行相应动作。
+
+##### MOVE target1: HOME, (frames)
+##### MOVE target1: RETURN, (frames)
+##### MOVE target1: FORWARD, (distance), (frames)
+##### MOVE target1: BACKWARD, (distance), (frames)
+##### MOVE target1: POINT, x coordinate, y coordinate, (frames)
+##### MOVE target1: target2, BASE, (frames), (offset)
+##### MOVE target1: target2, CENTER, (frames), (offset)
+##### MOVE target1: target2, HEAD, (frames), (offset)
+##### MOVE target1: target2, FRONT BASE, (frames), (offset)
+##### MOVE target1: target2, FRONT CENTER, (frames), (offset)
+##### MOVE target1: target2, FRONT HEAD, (frames), (offset)
+##### MOVE target1: target2, BACK BASE, (frames), (offset)
+##### MOVE target1: target2, BACK CENTER, (frames), (offset)
+##### MOVE target1: target2, BACK HEAD, (frames), (offset)
+
+使 `target1` 移动到指定地点。`auto` 会根据目标是友军还是敌军作出相应的处理。
+
+关于各个参数的含义，见下图：
+
+![ARGS](https://github.com/Sora-Shiro/RMMV-Learn/blob/master/img/7/1.jpg "ARGS")
+
+使用示例：
+- move user: home, 20
+- move target: forward, 48, 12
+- move enemy 1: point, 400, 300
+- move enemy 2: point, 500, 250, offset x -50, offset y -50
+- move actor 3: target, front base, 20
+- move user: target, front base, 20, auto offset x -100
+
+##### OPACITY target: x, (frames)
+##### OPACITY target: x%, (frames)
+
+改变目标的不透明度。
+
+##### SHAKE SCREEN: (power), (speed), (frames)
+
+震动画面。`power` 可取 0-9，默认为 5，`speed` 默认为 5，`frames` 默认为 60。
+
+##### TINT SCREEN: NORMAL, (frames)
+##### TINT SCREEN: DARK, (frames)
+##### TINT SCREEN: SEPIA, (frames)
+##### TINT SCREEN: SUNSET, (frames)
+##### TINT SCREEN: NIGHT, (frames)
+##### TINT SCREEN: (red), (green), (blue), (gray), (frames)
+
+设置画面色调。
+
+##### WAIT FOR FLOAT
+##### WAIT FOR JUMP
+##### WAIT FOR OPACITY
+
+等待所有战斗者的漂浮/跳跃/不透明度改变的完成。
+
+## 3. Action Sequence Pack 3 动作列表 Action List
+
+Action Sequence Pack 3 主要包括一些视觉上（visual）的扩展，你可以用它来操作镜头和画面缩放。
+
