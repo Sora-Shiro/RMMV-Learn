@@ -215,10 +215,7 @@ Sprite_SoraAvgAnimate.prototype.addSpriteChangeTask = function (changeTask) {
     var from = changeTask.from;
     switch (changeTask.type) {
         case "attr":
-            console.log(changeTask);
-            console.log(this[attrName]);
             this[attrName] = from;
-            console.log(this[attrName]);
             break;
         case "method":
             var tone = this.getColorTone();

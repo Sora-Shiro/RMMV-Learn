@@ -273,6 +273,10 @@ Sora.AvgUI.version = 1.00;
  * 变化没有统一的标准。
  * 3. 使用该脚本的其他指令时，务必先调用 StartStartSoraAvgMode 指令；同理，
  * 从 AVG 模式中离开后，务必调用 StopSoraAvgMode 指令。
+ * 4. AVG 菜单按钮目前有快进、停止、存储、读取、回放共 5 个按钮，每个按钮在
+ * [正常]、[触摸时]、[点击后的一段时间]都有不同的图片会被加载，它们分别对应
+ * a、b、c 共 3 种情况，命名时请使用 xxx_a，xxx_b，xxx_c 命名，最后在相应
+ * 的参数设置里填写 xxx 即可。
  * 
  * 
  * Use RMMV to create AVG environment, Need YEP_MessageCore.js and
@@ -308,6 +312,11 @@ Sora.AvgUI.version = 1.00;
  * 3. You must call `StartStartSoraAvgMode` command before you use any
  * other Plugin Commands from this plugin, and when exiting the AVG mode,
  * you must call `StopSoraAvgMode` command.
+ * 4. There are 5 button on AVG menu: speed, stop, save, load, playback.
+ * Each button has 3 bitmap displayed in different situation: normal(a), 
+ * touching(b), just-clicked(c). Please make sure the file is named 
+ * like xxx_a, xxx_b, xxx_c, and at last, just set corresponding param 
+ * value as `xxx`.
  * 
  * ============================================================================
  * 插件指令表  Plugin Commands
@@ -1144,26 +1153,38 @@ Window_Message.prototype.setSoraAvgMenuDetail = function () {
     }
 
     this._soraAvgMenuSpeed = new Sprite_SoraAvgAnimate(nothingBitmap);
-    this._soraAvgMenuSpeed.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed);
+    this._soraAvgMenuSpeed.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_a");
+    this._soraAvgMenuSpeed._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_a");
+    this._soraAvgMenuSpeed._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_b");
+    this._soraAvgMenuSpeed._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_c");
 
     this._soraAvgMenuStop = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuStop.y = height;
-    this._soraAvgMenuStop.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop);
-    this._soraAvgMenuStop._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop);
-    this._soraAvgMenuStop._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad);
-    this._soraAvgMenuStop._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed);
+    this._soraAvgMenuStop.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_a");
+    this._soraAvgMenuStop._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_a");
+    this._soraAvgMenuStop._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_b");
+    this._soraAvgMenuStop._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_c");
 
     this._soraAvgMenuSave = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuSave.y = height * 2;
-    this._soraAvgMenuSave.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave);
-    
+    this._soraAvgMenuSave.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_a");
+    this._soraAvgMenuSave._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_a");
+    this._soraAvgMenuSave._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_b");
+    this._soraAvgMenuSave._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_c");
+
     this._soraAvgMenuLoad = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuLoad.y = height * 3;
-    this._soraAvgMenuLoad.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad);
+    this._soraAvgMenuLoad.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_a");
+    this._soraAvgMenuLoad._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_a");
+    this._soraAvgMenuLoad._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_b");
+    this._soraAvgMenuLoad._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_c");
 
     this._soraAvgMenuPlayback = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuPlayback.y = height * 4;
-    this._soraAvgMenuPlayback.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback);
+    this._soraAvgMenuPlayback.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_a");
+    this._soraAvgMenuPlayback._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_a");
+    this._soraAvgMenuPlayback._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_b");
+    this._soraAvgMenuPlayback._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_c");
 
     this._soraAvgMenuSpeed.setClickHandler(Sora.AvgUI.callSpeedMessage);
     this._soraAvgMenuStop.setClickHandler(Sora.AvgUI.callStopSpedMessage);
