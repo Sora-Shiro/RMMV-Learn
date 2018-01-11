@@ -140,6 +140,24 @@ Sora.AvgUI.version = 1.00;
  * @param --Cg Sprite--
  * @default
  * 
+ * @param Left CG Position
+ * @parent --Cg Sprite--
+ * @type string
+ * @desc 左侧 CG 默认位置
+ * @default 320
+ * 
+ * @param Mid CG Position
+ * @parent --Cg Sprite--
+ * @type string
+ * @desc 中间 CG 默认位置
+ * @default 640
+ * 
+ * @param Right CG Position
+ * @parent --Cg Sprite--
+ * @type string
+ * @desc 右侧 CG 默认位置
+ * @default 960
+ * 
  * @param Auto Change Brightness
  * @parent --Cg Sprite--
  * @type boolean
@@ -213,7 +231,7 @@ Sora.AvgUI.version = 1.00;
  * @parent --Avg Menu--
  * @type string
  * @desc 菜单读取选项图片
- * @default stop
+ * @default load
  * 
  * @param Avg Menu Playback
  * @parent --Avg Menu--
@@ -226,7 +244,8 @@ Sora.AvgUI.version = 1.00;
  * 介绍和使用指南  Introduction and Instructions
  * ============================================================================
  *
- * 用 RMMV 制作 AVG ，需要 YEP_MessageCore.js 支持。
+ * 用 RMMV 制作 AVG ，需要 YEP_MessageCore.js、SoraShiro_SpriteCore.js
+ * 支持。
  * 
  * 需要在 img 目录下新建一个 AvgUI 文件夹，本插件需要的图片都要放在这个文件
  * 夹中。
@@ -248,7 +267,7 @@ Sora.AvgUI.version = 1.00;
  * 
  * 需要注意的地方：
  * 1. 每次调用 Show(Left/Mid/Right)AvgPic 指令，就会让最新的立绘置于最上方，
- * 开发者可以用 Move(Up/Down/Top/Bottom)(Left/Mid/Right)AvgPic 指令调整。
+ * 开发者可以用 AvgMove [optional orientation] [id] [num] 指令调整。
  * 2. 当姓名框关闭时，立绘的亮度不会发生变化。立绘的亮度此时留给开发者处理，
  * 因为此时常见的情况可能有两种：当前角色内心独白；旁白描述。此时的立绘亮度
  * 变化没有统一的标准。
@@ -256,7 +275,8 @@ Sora.AvgUI.version = 1.00;
  * 从 AVG 模式中离开后，务必调用 StopSoraAvgMode 指令。
  * 
  * 
- * Use RMMV to create AVG environment, Need YEP_MessageCore.js supported.
+ * Use RMMV to create AVG environment, Need YEP_MessageCore.js and
+ * SoraShiro_SpriteCore.js supported.
  * 
  * You need to create a folder named 'AvgUI' in 'img/' directory, and 
  * all pics this plugin needs should put in here.
@@ -279,7 +299,7 @@ Sora.AvgUI.version = 1.00;
  * 
  * Attention:
  * 1. `Show(Left/Mid/Right)AvgPic` will make the new CG at the top of 
- * layer, you can use `Move(Up/Down/Top/Bottom)(Left/Mid/Right)AvgPic`
+ * layer, you can use `AvgMove [optional orientation] [id] [num]`
  * to adjust it.
  * 2. CG's brightness will not change when Window_NameBox close, because
  * when this happend there may be 2 situations occur: current speaker 
@@ -467,6 +487,9 @@ Sora.Param.AvgUIMessageBoxPauseIcon = String(Sora.Parameters['Message Box Pause 
 Sora.Param.AvgUIMessageBoxPauseIconX = Number(Sora.Parameters['Message Box Pause Icon X'] || 640);
 Sora.Param.AvgUIMessageBoxPauseIconY = Number(Sora.Parameters['Message Box Pause Icon Y'] || 190);
 
+Sora.Param.LeftCgPosition = Number(Sora.Parameters['Left CG Position'] || 320);
+Sora.Param.MidCgPosition = Number(Sora.Parameters['Mid CG Position'] || 640);
+Sora.Param.RightCgPosition = Number(Sora.Parameters['Right CG Position'] || 960);
 Sora.Param.AvgUIAutoChangeBri = eval(Sora.Parameters['Auto Change Brightness']);
 Sora.Param.rta = Sora.Parameters['Real To Abbr'] || '{}';
 eval('Sora.Param.RealToAbbrEval = ' + Sora.Param.rta);
@@ -488,10 +511,10 @@ Sora.Param.AvgUIMenuPlayback = String(Sora.Parameters['Avg Menu Playback'] || 'p
 // SceneManager
 //=============================================================================
 
-SceneManager._screenWidth  = Sora.Param.ScreenWidth;
+SceneManager._screenWidth = Sora.Param.ScreenWidth;
 SceneManager._screenHeight = Sora.Param.ScreenHeight;
-SceneManager._boxWidth     = Sora.Param.ScreenWidth;
-SceneManager._boxHeight    = Sora.Param.ScreenHeight;
+SceneManager._boxWidth = Sora.Param.ScreenWidth;
+SceneManager._boxHeight = Sora.Param.ScreenHeight;
 
 //=============================================================================
 // ImageManager
@@ -577,10 +600,13 @@ Game_Interpreter.prototype.stopSoraAvgMode = function (args) {
 Game_Interpreter.prototype.showSoraAvgBg = function (args) {
     var filePath = args[0];
     var interpolatorAbbr = args[1] || "AD";
-    var interpolator = Sora.AvgUI.getInterpolatorByAbbr(interpolatorAbbr);
+    var interpolator = Sora.SpriteCore.getInterpolatorByAbbr(interpolatorAbbr);
     var duration = Number(args[2]) || 30;
     var soraAvgBg = Sora.AvgUI.SoraAvgBg;
-    soraAvgBg.addAttrChangeTask('opacity', 0, 255, interpolator, duration);
+    soraAvgBg.addSpriteChangeTask(
+        Task_SpriteChange.createNoCallbackTask(
+            'attr', 'opacity', 0, 255, interpolator, duration)
+    );
     soraAvgBg.bitmap = ImageManager.loadAvgUI(filePath);
     var filePrefix = filePath.split('-')[0];
     soraAvgBg._filePrefix = filePrefix;
@@ -588,10 +614,10 @@ Game_Interpreter.prototype.showSoraAvgBg = function (args) {
 
 Game_Interpreter.prototype.hideSoraAvgBg = function (args) {
     var interpolatorAbbr = args[0] || "AD";
-    var interpolator = Sora.AvgUI.getInterpolatorByAbbr(interpolatorAbbr);
+    var interpolator = Sora.SpriteCore.getInterpolatorByAbbr(interpolatorAbbr);
     var duration = Number(args[1]) || 30;
     var soraAvgBg = Sora.AvgUI.SoraAvgBg;
-    soraAvgBg.addAttrChangeTask('opacity', 255, 0, interpolator, duration);
+    soraAvgBg.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('attr', 'opacity', 255, 0, interpolator, duration));
 };
 
 Game_Interpreter.prototype.setNameBoxBg = function (args) {
@@ -636,15 +662,15 @@ Game_Interpreter.prototype.showAvgFixedPic = function (args, positionType) {
     args[4] = args[2];
     switch (positionType) {
         case 'left':
-            args[1] = 320;
+            args[1] = Sora.Param.LeftCgPosition;
             args[2] = 'left';
             break;
         case 'mid':
-            args[1] = 640;
+            args[1] = Sora.Param.MidCgPosition;
             args[2] = 'mid';
             break;
         case 'right':
-            args[1] = 960;
+            args[1] = Sora.Param.RightCgPosition;
             args[2] = 'right';
     }
     this.showAvgPic(args);
@@ -652,7 +678,7 @@ Game_Interpreter.prototype.showAvgFixedPic = function (args, positionType) {
 
 Game_Interpreter.prototype.showAvgPic = function (args) {
     var interpolatorAbbr = args[3] || "AD";
-    var interpolator = Sora.AvgUI.getInterpolatorByAbbr(interpolatorAbbr);
+    var interpolator = Sora.SpriteCore.getInterpolatorByAbbr(interpolatorAbbr);
     var duration = Number(args[4]) || 30;
     Sora.AvgUI.showAvgPic(args[0], args[1], args[2], interpolator, duration);
 };
@@ -675,7 +701,7 @@ Game_Interpreter.prototype.hideAvgFixedPic = function (args, id) {
 
 Game_Interpreter.prototype.hideAvgPic = function (args, id) {
     var interpolatorAbbr = args[0] || "AD";
-    var interpolator = Sora.AvgUI.getInterpolatorByAbbr(interpolatorAbbr);
+    var interpolator = Sora.SpriteCore.getInterpolatorByAbbr(interpolatorAbbr);
     var duration = Number(args[1]) || 30;
     Sora.AvgUI.hideAvgPic(id, interpolator, duration);
 };
@@ -724,7 +750,7 @@ Sora.AvgUI.showAvgPic = function (targetPath, targetX, targetId, interpolator, d
     targetSprite.x = x;
     targetSprite.y = y;
     targetSprite.anchor = new Point(0.5, 1);
-    targetSprite.addAttrChangeTask('opacity', 0, 255, interpolator, duration);
+    targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('attr', 'opacity', 0, 255, interpolator, duration));
     targetSprite.bitmap = bitmap;
     var filePrefix = targetPath.split('-')[0];
     targetSprite._filePrefix = filePrefix;
@@ -747,7 +773,7 @@ Sora.AvgUI.hideAvgPic = function (id, interpolator, duration) {
     var targetSpriteInfo = Sora.AvgUI.getPicFromPics(id);
     if (targetSpriteInfo === null) return;
     var targetSprite = targetSpriteInfo[0];
-    targetSprite.addAttrChangeTask('opacity', 255, 0, interpolator, duration);
+    targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('attr', 'opacity', 255, 0, interpolator, duration));
 }
 
 Sora.AvgUI.getPicFromPics = function (id) {
@@ -774,39 +800,39 @@ Sora.AvgUI.animateAvgBgSprite = function (animateType, duration) {
 }
 
 Sora.AvgUI.animateAvgSprite = function (targetSprite, animateType, duration) {
-    var ADInterpolator = Sora.AvgUI.InterpolatorTable['AD'];
-    var CycleInterpolator = Sora.AvgUI.InterpolatorTable['C'];
+    var ADInterpolator = Sora.SpriteCore.getInterpolatorByAbbr('AD');
+    var CycleInterpolator = Sora.SpriteCore.getInterpolatorByAbbr('C');
     animateType = animateType.toLocaleUpperCase();
     switch (animateType) {
         case "FLIPX":
-            targetSprite.addExtraAttrChangeTask("scaleX", 1, -1, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "scaleX", 1, -1, ADInterpolator, duration));
             break;
         case "FLIPXBACK":
-            targetSprite.addExtraAttrChangeTask("scaleX", -1, 1, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "scaleX", -1, 1, ADInterpolator, duration));
             break;
         case "FLIPY":
-            targetSprite.addExtraAttrChangeTask("scaleY", 1, -1, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "scaleY", 1, -1, ADInterpolator, duration));
             break;
         case "FLIPYBACK":
-            targetSprite.addExtraAttrChangeTask("scaleY", -1, 1, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "scaleY", -1, 1, ADInterpolator, duration));
             break;
         case "GREY":
-            targetSprite.addExtraAttrChangeTask("grey", 0, 128, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "grey", 0, 128, ADInterpolator, duration));
             break;
         case "GREYBACK":
-            targetSprite.addExtraAttrChangeTask("grey", 128, 0, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "grey", 128, 0, ADInterpolator, duration));
             break;
         case "SHAKEH":
-            targetSprite.addAttrChangeTask("x", targetSprite.x, targetSprite.x + 30, CycleInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('attr', "x", targetSprite.x, targetSprite.x + 30, CycleInterpolator, duration));
             break;
         case "SHAKEV":
-            targetSprite.addAttrChangeTask("y", targetSprite.y, targetSprite.y + 30, CycleInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('attr', "y", targetSprite.y, targetSprite.y + 30, CycleInterpolator, duration));
             break;
         case "DARK":
-            targetSprite.addExtraAttrChangeTask("rgb", 0, -68, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "rgb", 0, -68, ADInterpolator, duration));
             break;
         case "LIGHT":
-            targetSprite.addExtraAttrChangeTask("rgb", -68, 0, ADInterpolator, duration);
+            targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "rgb", -68, 0, ADInterpolator, duration));
             break;
     }
 }
@@ -820,14 +846,18 @@ Sora.AvgUI.changeAvgCgBrightness = function (realName) {
         var child = avgPicsChildren[i];
         var nowTone = child.getColorTone();
         if (avgPicsChildren[i]._filePrefix === abbr) {
-            child.addExtraAttrChangeTask(
-                "rgb", nowTone[0], 0,
-                Sora.AvgUI.getInterpolatorByAbbr("AD"), 10);
+            child.addSpriteChangeTask(
+                Task_SpriteChange.createNoCallbackTask(
+                    "method", "rgb", nowTone[0], 0,
+                    Sora.SpriteCore.getInterpolatorByAbbr("AD"), 10)
+            );
             frontIndex = i;
         } else {
-            child.addExtraAttrChangeTask(
-                "rgb", nowTone[0], -68,
-                Sora.AvgUI.getInterpolatorByAbbr("AD"), 10);
+            child.addSpriteChangeTask(
+                Task_SpriteChange.createNoCallbackTask(
+                    "method", "rgb", nowTone[0], -68,
+                    Sora.SpriteCore.getInterpolatorByAbbr("AD"), 10)
+            );
         }
     }
     if (frontIndex >= 0) {
@@ -859,346 +889,6 @@ Sora.AvgUI.moveAvgPic = function (orientation, id, num) {
     children.splice(index, 1);
     children.splice(targetLayer, 0, targetSprite);
 }
-
-//=============================================================================
-// New: Sprite_SoraAvgAnimate
-//=============================================================================			
-
-function Sprite_SoraAvgAnimate() {
-    this.initialize.apply(this, arguments);
-}
-
-Sprite_SoraAvgAnimate.prototype = Object.create(Sprite.prototype);
-Sprite_SoraAvgAnimate.prototype.constructor = Sprite_SoraAvgAnimate;
-
-Sprite_SoraAvgAnimate.prototype.initialize = function () {
-    Sprite.prototype.initialize.call(this);
-    this._attrChangeTasks = [];
-    this._filePrefix = "";
-    this._touching = false;
-    this._clickHandler = null;
-};
-
-Sprite_SoraAvgAnimate.prototype.update = function () {
-    Sprite.prototype.update.call(this);
-    this.updateAnimation();
-    this.processTouch();
-};
-
-Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
-    for (var i = 0; i < this._attrChangeTasks.length; i++) {
-        var changeTask = this._attrChangeTasks[i];
-        var duration = changeTask['duration'];
-        var ticker = changeTask['ticker'];
-        ticker++;
-        if (ticker > duration) {
-            this._attrChangeTasks.splice(i, 1);
-            var callback = changeTask['callback'];
-            if (callback && (typeof callback === "function")) {
-                callback();
-            }
-            continue;
-        }
-        var attrName = changeTask['attrName'];
-        var from = changeTask['from'];
-        var to = changeTask['to'];
-        var interpolator = changeTask['interpolator'];
-        changeTask['ticker'] = ticker;
-        var calcRate = interpolator(ticker / duration);
-        var distance = (to - from) * calcRate;
-        now = from + distance;
-        switch (changeTask.type) {
-            case "attr":
-                this[attrName] = now;
-                break;
-            case "method":
-                var tone = this.getColorTone();
-                switch (attrName) {
-                    case "rgb":
-                        tone[0] = now;
-                        tone[1] = now;
-                        tone[2] = now;
-                        this.setColorTone(tone);
-                        break;
-                    case "grey":
-                        tone[3] = now;
-                        this.setColorTone(tone);
-                        break;
-                    case "scaleX":
-                        this['scale']['x'] = now;
-                        break;
-                    case "scaleY":
-                        this['scale']['y'] = now;
-                        break;
-                }
-                break;
-        }
-    }
-};
-
-Sprite_SoraAvgAnimate.prototype.processTouch = function () {
-    if (this.isActive()) {
-        if (TouchInput.isTriggered() && this.isButtonTouched()) {
-            this._touching = true;
-        }
-        if (this._touching) {
-            if (TouchInput.isReleased() || !this.isButtonTouched()) {
-                this._touching = false;
-                if (TouchInput.isReleased()) {
-                    this.callClickHandler();
-                }
-            }
-        }
-    } else {
-        this._touching = false;
-    }
-};
-
-Sprite_SoraAvgAnimate.prototype.isActive = function () {
-    var node = this;
-    while (node) {
-        if (!node.visible) {
-            return false;
-        }
-        node = node.parent;
-    }
-    return true;
-};
-
-Sprite_SoraAvgAnimate.prototype.isButtonTouched = function () {
-    var x = this.canvasToLocalX(TouchInput.x);
-    var y = this.canvasToLocalY(TouchInput.y);
-    return x >= 0 && y >= 0 && x < this.width && y < this.height;
-};
-
-Sprite_SoraAvgAnimate.prototype.canvasToLocalX = function (x) {
-    var node = this;
-    while (node) {
-        x -= node.x;
-        node = node.parent;
-    }
-    return x;
-};
-
-Sprite_SoraAvgAnimate.prototype.canvasToLocalY = function (y) {
-    var node = this;
-    while (node) {
-        y -= node.y;
-        node = node.parent;
-    }
-    return y;
-};
-
-Sprite_SoraAvgAnimate.prototype.setClickHandler = function (method) {
-    this._clickHandler = method;
-};
-
-Sprite_SoraAvgAnimate.prototype.callClickHandler = function () {
-    if (this._clickHandler) {
-        this._clickHandler();
-    }
-};
-
-Sprite_SoraAvgAnimate.prototype.addAttrChangeTask = function (attrName, from, to, interpolator, duration, callback) {
-    Sprite.prototype.update.call(this);
-    for (var i = 0; i < this._attrChangeTasks.length; i++) {
-        var changeTask = this._attrChangeTasks[i];
-        var aName = changeTask['attrName'];
-        if (aName === attrName) {
-            this._attrChangeTasks.splice(i, 1);
-            continue;
-        }
-    }
-    if (duration < 1) duration = 1;
-    this._attrChangeTasks.push(
-        {
-            'type': "attr",
-            'attrName': attrName,
-            'from': from,
-            'to': to,
-            'interpolator': interpolator,
-            'duration': duration,
-            'ticker': 0,
-            'callback': callback,
-        }
-    );
-    this[attrName] = from;
-};
-
-Sprite_SoraAvgAnimate.prototype.addExtraAttrChangeTask = function (attrName, from, to, interpolator, duration, callback) {
-    Sprite.prototype.update.call(this);
-    for (var i = 0; i < this._attrChangeTasks.length; i++) {
-        var changeTask = this._attrChangeTasks[i];
-        var aName = changeTask['attrName'];
-        if (aName === attrName) {
-            this._attrChangeTasks.splice(i, 1);
-            continue;
-        }
-    }
-    this._attrChangeTasks.push(
-        {
-            'type': "method",
-            'attrName': attrName,
-            'from': from,
-            'to': to,
-            'interpolator': interpolator,
-            'duration': duration,
-            'ticker': 0,
-            'callback': callback,
-        }
-    );
-    var tone = this.getColorTone();
-    switch (attrName) {
-        case "rgb":
-            tone[0] = from;
-            tone[1] = from;
-            tone[2] = from;
-            this.setColorTone(tone);
-            break;
-        case "grey":
-            tone[3] = from;
-            this.setColorTone(tone);
-            break;
-        case "scaleX":
-            this['scale']['x'] = from;
-            break;
-        case "scaleY":
-            this['scale']['y'] = from;
-            break;
-    }
-};
-
-//=============================================================================
-// New: Animation Interpolator
-//=============================================================================
-
-Sora.AvgUI.getInterpolatorByAbbr = function (abbr) {
-    var key = abbr.toLocaleUpperCase();
-    var result = Sora.AvgUI.InterpolatorTable[key];
-    if (result == null) {
-        console.error("There is no Interpolator's abbr is" + abbr + "!!");
-    }
-    return Sora.AvgUI.InterpolatorTable[key];
-};
-
-// Basic
-
-Sora.AvgUI.LinearInterpolator = function (x) {
-    return x;
-}
-
-Sora.AvgUI.SmoothStepInterpolator = function (x) {
-    return x * x * (3.0 - 2.0 * x);
-}
-
-Sora.AvgUI.SpringInterpolator = function (x, f) {
-    var factor = f || 0.4;
-    return Math.pow(2, -10 * x) * Math.sin((x - factor / 4) * (2 * Math.PI) / factor) + 1;
-}
-
-// Android
-
-Sora.AvgUI.AccelerateDecelerateInterpolator = function (x) {
-    return (Math.cos((x + 1) * Math.PI) / 2.0) + 0.5;
-}
-
-Sora.AvgUI.BounceInterpolator = function (x) {
-
-    function bounce(t) { return t * t * 8; }
-
-    var result;
-    if (x < 0.3535)
-        result = bounce(x);
-    else if (x < 0.7408)
-        result = bounce(x - 0.54719) + 0.7;
-    else if (x < 0.9644)
-        result = bounce(x - 0.8526) + 0.9;
-    else
-        result = bounce(x - 1.0435) + 0.95;
-    return result;
-}
-
-Sora.AvgUI.AccelerateInterpolator = function (x, f) {
-    var factor = f || 1.0;
-    if (factor == 1.0)
-        return x * x;
-    else
-        return Math.pow(x, 2.0 * factor);
-}
-
-Sora.AvgUI.AnticipateInterpolator = function (x, t) {
-    var tension = t || 2.0;
-    return x * x * ((tension + 1.0) * x - tension);
-}
-
-Sora.AvgUI.AnticipateOvershootInterpolator = function (x, t) {
-    var tension = t || (2.0 * 1.5);
-
-    function a(t, s) { return t * t * ((s + 1) * t - s); }
-    function o(t, s) { return t * t * ((s + 1) * t + s); }
-
-    if (x < 0.5)
-        0.5 * a(x * 2.0, tension);
-    else
-        0.5 * (o(x * 2.0 - 2.0, tension) + 2.0);
-}
-
-Sora.AvgUI.CycleInterpolator = function (x, c) {
-    var cycles = c || 1.0;
-    return Math.sin(2.0 * cycles * Math.PI * x);
-}
-
-Sora.AvgUI.DecelerateInterpolator = function (x, f) {
-    var factor = f || 1.0;
-    if (factor == 1.0)
-        return (1.0 - (1.0 - x) * (1.0 - x));
-    else
-        return (1.0 - Math.pow((1.0 - x), 2.0 * factor));
-}
-
-Sora.AvgUI.OvershootInterpolator = function (x, t) {
-    var tension = t || 2.0;
-    x -= 1.0;
-    return x * x * ((tension + 1.0) * x + tension) + 1.0;
-}
-
-// Advanced
-
-Sora.AvgUI.CubicHermiteInterpolator = function (x, p_0, p_1, m_0, m_1) {
-
-    var x = x;
-    var p0 = p_0 || 0;
-    var p1 = p_1 || 1;
-    var m0 = m_0 || 4;
-    var m1 = m_1 || 4;
-
-    function CubicHermite(t, p0, p1, m0, m1) {
-        t2 = t * t;
-        t3 = t2 * t;
-        return (2.0 * t3 - 3.0 * t2 + 1.0) * p0
-            + (t3 - 2.0 * t2 + t) * m0
-            + (-2.0 * t3 + 3.0 * t2) * p1
-            + (t3 - t2) * m1;
-    }
-
-    //time, start, end, tangent0, tangent1
-    //modify tangent0 and tangent1
-    return CubicHermite(x, p0, p1, m0, m1);
-}
-
-Sora.AvgUI.InterpolatorTable = {};
-Sora.AvgUI.InterpolatorTable["L"] = Sora.AvgUI.LinearInterpolator;
-Sora.AvgUI.InterpolatorTable["SS"] = Sora.AvgUI.SmoothStepInterpolator;
-Sora.AvgUI.InterpolatorTable["SR"] = Sora.AvgUI.SpringInterpolator;
-Sora.AvgUI.InterpolatorTable["AD"] = Sora.AvgUI.AccelerateDecelerateInterpolator;
-Sora.AvgUI.InterpolatorTable["B"] = Sora.AvgUI.BounceInterpolator;
-Sora.AvgUI.InterpolatorTable["A"] = Sora.AvgUI.AccelerateInterpolator;
-Sora.AvgUI.InterpolatorTable["AT"] = Sora.AvgUI.AnticipateInterpolator;
-Sora.AvgUI.InterpolatorTable["ATO"] = Sora.AvgUI.AnticipateOvershootInterpolator;
-Sora.AvgUI.InterpolatorTable["C"] = Sora.AvgUI.CycleInterpolator;
-Sora.AvgUI.InterpolatorTable["D"] = Sora.AvgUI.DecelerateInterpolator;
-Sora.AvgUI.InterpolatorTable["O"] = Sora.AvgUI.OvershootInterpolator;
-Sora.AvgUI.InterpolatorTable["CH"] = Sora.AvgUI.CubicHermiteInterpolator;
 
 //=============================================================================
 // New: Avg Menu Callback
@@ -1414,9 +1104,9 @@ Window_Message.prototype.initialize = function () {
     this.setSoraPauseIcon();
 };
 
-Window_Message.prototype.setSoraPauseIcon = function() {
+Window_Message.prototype.setSoraPauseIcon = function () {
     var nothingBitmap = new Bitmap(0, 0);
-    this._soraAvgPauseIcon  = new Sprite_SoraAvgAnimate(nothingBitmap);
+    this._soraAvgPauseIcon = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgPauseIcon.anchor = new Point(0.5, 0.5);
     this._soraAvgPauseIcon.x = Sora.Param.AvgUIMessageBoxPauseIconX;
     this._soraAvgPauseIcon.y = Sora.Param.AvgUIMessageBoxPauseIconY;
@@ -1459,11 +1149,14 @@ Window_Message.prototype.setSoraAvgMenuDetail = function () {
     this._soraAvgMenuStop = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuStop.y = height;
     this._soraAvgMenuStop.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop);
+    this._soraAvgMenuStop._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop);
+    this._soraAvgMenuStop._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad);
+    this._soraAvgMenuStop._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed);
 
     this._soraAvgMenuSave = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuSave.y = height * 2;
     this._soraAvgMenuSave.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave);
-
+    
     this._soraAvgMenuLoad = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuLoad.y = height * 3;
     this._soraAvgMenuLoad.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad);
@@ -1486,7 +1179,7 @@ Window_Message.prototype.setSoraAvgMenuDetail = function () {
 }
 
 Window_Message.prototype.isTriggered = function () {
-    if(this._soraAvgMenu.visible && this._soraAvgMenu.isButtonTouched()) {
+    if (this._soraAvgMenu.visible && this._soraAvgMenu.isButtonTouched()) {
         return false;
     }
     return (Input.isRepeated('ok') || Input.isRepeated('cancel') ||
@@ -1618,7 +1311,7 @@ Window_Message.prototype.update = function () {
 // relates with the visiable of the pause icon! 
 // Because I want to custom pause icon, so I must change all methods
 // using `this.pause` to use another var. = =
-Window_Message.prototype.oldestUpdateInput = function() {
+Window_Message.prototype.oldestUpdateInput = function () {
     if (this.isAnySubWindowActive()) {
         return true;
     }
@@ -1635,17 +1328,17 @@ Window_Message.prototype.oldestUpdateInput = function() {
     return false;
 };
 
-Window_Message.prototype.updateInput = function() {
+Window_Message.prototype.updateInput = function () {
     if (this._soraPause && this.isFastForward()) {
-      if (!this._textState) {
-        this.soraPause = false;
-        this.terminateMessage();
-      }
+        if (!this._textState) {
+            this.soraPause = false;
+            this.terminateMessage();
+        }
     }
     return this.oldestUpdateInput();
 };
 
-Window_Message.prototype.updateMessage = function() {
+Window_Message.prototype.updateMessage = function () {
     if (this._textState) {
         while (!this.isEndOfText(this._textState)) {
             if (this.needsNewPage(this._textState)) {
@@ -1669,7 +1362,7 @@ Window_Message.prototype.updateMessage = function() {
     }
 };
 
-Window_Message.prototype.startPause = function() {
+Window_Message.prototype.startPause = function () {
     this.startWait(10);
     this._soraPause = true;
 };
