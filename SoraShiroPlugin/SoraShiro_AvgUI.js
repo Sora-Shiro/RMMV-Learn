@@ -1395,6 +1395,7 @@ Window_Message.prototype.update = function () {
     this.x = 0;
     this.y = SceneManager._boxHeight - this.height;
     this._soraAvgPauseIcon.visible = this._soraPause;
+    this._soraAvgMenu.visible = Sora.Param.AvgUIMenuEnable;
 };
 
 // 万恶的 this.pause，它不仅仅是个 flag，它还和暂停标记的显示绑定在一起。
