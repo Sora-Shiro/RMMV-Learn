@@ -1343,8 +1343,8 @@ Window_Message.prototype.newPage = function (textState) {
     // Modified
     textState.x = this.newLineX()
         + Sora.Param.AvgUIMessageBoxPaddingLeft;
-    textState.y = Sora.AvgUI.AdjustMessageY +
-        Sora.Param.AvgUIMessageBoxPaddingTop;
+    textState.y = this.newLineY()
+        + Sora.Param.AvgUIMessageBoxPaddingTop;
     this.setWindowBg();
     if (textState.index === 0) {
         this._soraLine = 1;
@@ -1358,6 +1358,15 @@ Window_Message.prototype.newLineX = function () {
     if (Sora.AvgUI.AdjustFace) {
         return $gameMessage.faceName() === '' ?
             0 : Sora.AvgUI.AdjustMessageX;
+    } else {
+        return 0;
+    }
+};
+
+Window_Message.prototype.newLineY = function () {
+    if (Sora.AvgUI.AdjustFace) {
+        return $gameMessage.faceName() === '' ?
+            0 : Sora.AvgUI.AdjustMessageY;
     } else {
         return 0;
     }
