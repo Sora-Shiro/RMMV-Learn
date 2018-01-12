@@ -137,6 +137,48 @@ Sora.AvgUI.version = 1.00;
  * @desc 消息窗口暂停标记图标相对于消息窗口的 Y 坐标
  * @default 190
  * 
+ * @param Adjust Face
+ * @parent --Message Box--
+ * @type boolean
+ * @desc 是否在显示脸图时调整消息框文本
+ * @default false
+ * 
+ * @param Adjust Message X
+ * @parent --Message Box--
+ * @type number
+ * @desc 显示脸图时调整消息框文本 X 坐标
+ * @default 0
+ * 
+ * @param Adjust Message Y
+ * @parent --Message Box--
+ * @type number
+ * @desc 显示脸图时调整消息框文本 Y 坐标
+ * @default 0
+ * 
+ * @param Adjust Face X
+ * @parent --Message Box--
+ * @type number
+ * @desc 显示脸图时调脸图 X 坐标
+ * @default 15
+ * 
+ * @param Adjust Face Y
+ * @parent --Message Box--
+ * @type number
+ * @desc 显示脸图时脸图 Y 坐标
+ * @default 15
+ * 
+ * @param Adjust Face Width
+ * @parent --Message Box--
+ * @type number
+ * @desc 显示脸图时脸图宽度
+ * @default 144
+ * 
+ * @param Adjust Face Height
+ * @parent --Message Box--
+ * @type number
+ * @desc 显示脸图时脸图高度
+ * @default 144
+ * 
  * @param --Cg Sprite--
  * @default
  * 
@@ -495,6 +537,13 @@ Sora.Param.AvgUIMessageBoxRowSpacingShift = Number(Sora.Parameters['Message Box 
 Sora.Param.AvgUIMessageBoxPauseIcon = String(Sora.Parameters['Message Box Pause Icon'] || 'pauseicon');
 Sora.Param.AvgUIMessageBoxPauseIconX = Number(Sora.Parameters['Message Box Pause Icon X'] || 640);
 Sora.Param.AvgUIMessageBoxPauseIconY = Number(Sora.Parameters['Message Box Pause Icon Y'] || 190);
+Sora.AvgUI.AdjustFace = eval(Sora.Parameters['Adjust Face']);
+Sora.AvgUI.AdjustMessageX = Number(Sora.Parameters['Adjust Message X'] || 0);
+Sora.AvgUI.AdjustMessageY = Number(Sora.Parameters['Adjust Message X'] || 0);
+Sora.AvgUI.AdjustFaceX = Number(Sora.Parameters['Adjust Face X'] || 15);
+Sora.AvgUI.AdjustFaceY = Number(Sora.Parameters['Adjust Face Y'] || 15);
+Sora.AvgUI.AdjustFaceWidth = Number(Sora.Parameters['Adjust Face Width'] || 144);
+Sora.AvgUI.AdjustFaceHeight = Number(Sora.Parameters['Adjust Face Height'] || 144);
 
 Sora.Param.LeftCgPosition = Number(Sora.Parameters['Left CG Position'] || 320);
 Sora.Param.MidCgPosition = Number(Sora.Parameters['Mid CG Position'] || 640);
@@ -1153,38 +1202,38 @@ Window_Message.prototype.setSoraAvgMenuDetail = function () {
     }
 
     this._soraAvgMenuSpeed = new Sprite_SoraAvgAnimate(nothingBitmap);
-    this._soraAvgMenuSpeed.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_a");
-    this._soraAvgMenuSpeed._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_a");
-    this._soraAvgMenuSpeed._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_b");
-    this._soraAvgMenuSpeed._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed+"_c");
+    this._soraAvgMenuSpeed.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed + "_a");
+    this._soraAvgMenuSpeed._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed + "_a");
+    this._soraAvgMenuSpeed._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed + "_b");
+    this._soraAvgMenuSpeed._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSpeed + "_c");
 
     this._soraAvgMenuStop = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuStop.y = height;
-    this._soraAvgMenuStop.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_a");
-    this._soraAvgMenuStop._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_a");
-    this._soraAvgMenuStop._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_b");
-    this._soraAvgMenuStop._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop+"_c");
+    this._soraAvgMenuStop.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop + "_a");
+    this._soraAvgMenuStop._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop + "_a");
+    this._soraAvgMenuStop._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop + "_b");
+    this._soraAvgMenuStop._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuStop + "_c");
 
     this._soraAvgMenuSave = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuSave.y = height * 2;
-    this._soraAvgMenuSave.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_a");
-    this._soraAvgMenuSave._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_a");
-    this._soraAvgMenuSave._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_b");
-    this._soraAvgMenuSave._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave+"_c");
+    this._soraAvgMenuSave.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave + "_a");
+    this._soraAvgMenuSave._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave + "_a");
+    this._soraAvgMenuSave._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave + "_b");
+    this._soraAvgMenuSave._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuSave + "_c");
 
     this._soraAvgMenuLoad = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuLoad.y = height * 3;
-    this._soraAvgMenuLoad.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_a");
-    this._soraAvgMenuLoad._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_a");
-    this._soraAvgMenuLoad._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_b");
-    this._soraAvgMenuLoad._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad+"_c");
+    this._soraAvgMenuLoad.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad + "_a");
+    this._soraAvgMenuLoad._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad + "_a");
+    this._soraAvgMenuLoad._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad + "_b");
+    this._soraAvgMenuLoad._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuLoad + "_c");
 
     this._soraAvgMenuPlayback = new Sprite_SoraAvgAnimate(nothingBitmap);
     this._soraAvgMenuPlayback.y = height * 4;
-    this._soraAvgMenuPlayback.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_a");
-    this._soraAvgMenuPlayback._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_a");
-    this._soraAvgMenuPlayback._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_b");
-    this._soraAvgMenuPlayback._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback+"_c");
+    this._soraAvgMenuPlayback.bitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback + "_a");
+    this._soraAvgMenuPlayback._normalBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback + "_a");
+    this._soraAvgMenuPlayback._touchingBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback + "_b");
+    this._soraAvgMenuPlayback._justClickedBitmap = ImageManager.loadAvgUI(Sora.Param.AvgUIMenuPlayback + "_c");
 
     this._soraAvgMenuSpeed.setClickHandler(Sora.AvgUI.callSpeedMessage);
     this._soraAvgMenuStop.setClickHandler(Sora.AvgUI.callStopSpedMessage);
@@ -1304,6 +1353,21 @@ Window_Message.prototype.newPage = function (textState) {
     textState.height = this.calcTextHeight(textState, false);
 };
 
+Window_Message.prototype.newLineX = function () {
+    if (Sora.AvgUI.AdjustFace) {
+        return $gameMessage.faceName() === '' ?
+            Sora.AvgUI.AdjustMessageX : Sora.AvgUI.AdjustMessageY;
+    } else {
+        return 0;
+    }
+};
+
+Window_Message.prototype.drawMessageFace = function () {
+    this.drawFace($gameMessage.faceName(), $gameMessage.faceIndex(),
+        Sora.AvgUI.AdjustFaceX, Sora.AvgUI.AdjustFaceY,
+        Sora.AvgUI.AdjustFaceWidth, Sora.AvgUI.AdjustFaceHeight);
+};
+
 Sora.AvgUI.Window_Message_adjustWindowSettings = Window_Message.prototype.adjustWindowSettings;
 Window_Message.prototype.adjustWindowSettings = function () {
     this.createContents();
@@ -1322,8 +1386,6 @@ Window_Message.prototype.update = function () {
     this.y = SceneManager._boxHeight - this.height;
     this._soraAvgPauseIcon.visible = this._soraPause;
 };
-
-
 
 // 万恶的 this.pause，它不仅仅是个 flag，它还和暂停标记的显示绑定在一起。
 // 为了永远不显示这个暂停标记，并可以自定义暂停标记，我只能在用到它的地

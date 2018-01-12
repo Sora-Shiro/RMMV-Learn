@@ -63,13 +63,44 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
     for (var i = 0; i < this._attrChangeTasks.length; i++) {
         var changeTask = this._attrChangeTasks[i];
         var duration = changeTask['duration'];
-        var ticker = changeTask['ticker'];
-        ticker++;
+        changeTask.ticker++;
+        var ticker = changeTask.ticker;
+        ticker = ticker - changeTask.pre;
+        if(ticker <= 0) continue;
         if (ticker > duration) {
             this._attrChangeTasks.splice(i, 1);
-            var finishCallback = changeTask['finishCallback'];
-            if (finishCallback && (typeof finishCallback === "function")) {
-                finishCallback();
+            var task = changeTask;
+            var reverseRepeat = task.reverseRepeat;
+            if (reverseRepeat > 0) {
+                var reverseStartCallback = changeTask['reverseStartCallback'];
+                if (reverseStartCallback && (typeof reverseStartCallback === "function")) {
+                    reverseStartCallback(task);
+                }
+
+                reverseRepeat--;
+                task.ticker = 0;
+                var temp = task.from;
+                task.from = task.to;
+                task.to = temp;
+                task.pre = 0;
+                this.addSpriteChangeTask(task);
+            } else if (reverseRepeat < 0) {
+                var reverseStartCallback = changeTask['reverseStartCallback'];
+                if (reverseStartCallback && (typeof reverseStartCallback === "function")) {
+                    reverseStartCallback(task);
+                }
+
+                task.ticker = 0;
+                var temp = task.from;
+                task.from = task.to;
+                task.to = temp;
+                task.pre = 0;
+                this.addSpriteChangeTask(task);
+            } else {
+                var finishCallback = changeTask['finishCallback'];
+                if (finishCallback && (typeof finishCallback === "function")) {
+                    finishCallback();
+                }
             }
             continue;
         }
@@ -77,7 +108,6 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
         var from = changeTask['from'];
         var to = changeTask['to'];
         var interpolator = changeTask['interpolator'];
-        changeTask['ticker'] = ticker;
         var calcRate = interpolator(ticker / duration);
         var distance = (to - from) * calcRate;
         now = from + distance;
@@ -109,7 +139,7 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
         }
         var calculateCallback = changeTask['calculateCallback'];
         if (calculateCallback && (typeof calculateCallback === "function")) {
-            calculateCallback();
+            calculateCallback(now);
         }
     }
 };
@@ -260,9 +290,12 @@ Task_SpriteChange.prototype.initialize = function () {
     this.to = 0;
     this.interpolator = Sora.SpriteCore.getInterpolatorByAbbr('AD');
     this.ticker = 0;
+    this.pre = 0;
     this.duration = 60;
     this.finishCallback = null;
     this.calculateCallback = null;
+    this.reverseStartCallback = null;
+    this.reverseRepeat = 0;
 };
 
 Task_SpriteChange.createNoCallbackTask = function (type, attrName, from, to, interpolator, duration) {
