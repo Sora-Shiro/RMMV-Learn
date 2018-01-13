@@ -62,7 +62,7 @@ Sprite_SoraAvgAnimate.prototype.update = function () {
 Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
     for (var i = 0; i < this._attrChangeTasks.length; i++) {
         var changeTask = this._attrChangeTasks[i];
-        var duration = changeTask['duration'];
+        var duration = changeTask.duration;
         changeTask.ticker++;
         var ticker = changeTask.ticker;
         ticker = ticker - changeTask.pre;
@@ -71,8 +71,8 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
             this._attrChangeTasks.splice(i, 1);
             var task = changeTask;
             var reverseRepeat = task.reverseRepeat;
+            var reverseStartCallback = changeTask.reverseStartCallback;
             if (reverseRepeat > 0) {
-                var reverseStartCallback = changeTask['reverseStartCallback'];
                 if (reverseStartCallback && (typeof reverseStartCallback === "function")) {
                     reverseStartCallback(task);
                 }
@@ -85,7 +85,6 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
                 task.pre = 0;
                 this.addSpriteChangeTask(task);
             } else if (reverseRepeat < 0) {
-                var reverseStartCallback = changeTask['reverseStartCallback'];
                 if (reverseStartCallback && (typeof reverseStartCallback === "function")) {
                     reverseStartCallback(task);
                 }
@@ -97,17 +96,17 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
                 task.pre = 0;
                 this.addSpriteChangeTask(task);
             } else {
-                var finishCallback = changeTask['finishCallback'];
+                var finishCallback = changeTask.finishCallback;
                 if (finishCallback && (typeof finishCallback === "function")) {
                     finishCallback();
                 }
             }
             continue;
         }
-        var attrName = changeTask['attrName'];
-        var from = changeTask['from'];
-        var to = changeTask['to'];
-        var interpolator = changeTask['interpolator'];
+        var attrName = changeTask.attrName;
+        var from = changeTask.from;
+        var to = changeTask.to;
+        var interpolator = changeTask.interpolator;
         var calcRate = interpolator(ticker / duration);
         var distance = (to - from) * calcRate;
         now = from + distance;
@@ -129,15 +128,15 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
                         this.setColorTone(tone);
                         break;
                     case "scaleX":
-                        this['scale']['x'] = now;
+                        this.scale.x = now;
                         break;
                     case "scaleY":
-                        this['scale']['y'] = now;
+                        this.scale.y = now;
                         break;
                 }
                 break;
         }
-        var calculateCallback = changeTask['calculateCallback'];
+        var calculateCallback = changeTask.calculateCallback;
         if (calculateCallback && (typeof calculateCallback === "function")) {
             calculateCallback(now);
         }
@@ -171,7 +170,7 @@ Sprite_SoraAvgAnimate.prototype.processJustClick = function () {
             this._justClicked = false;
         }
     }
-}
+};
 
 Sprite_SoraAvgAnimate.prototype.updateBitmap = function () {
     if (this._touching && this._touchingBitmap) {
@@ -231,7 +230,7 @@ Sprite_SoraAvgAnimate.prototype.callClickHandler = function () {
 Sprite_SoraAvgAnimate.prototype.addSpriteChangeTask = function (changeTask) {
     // Check Repeat
     for (var i = 0; i < this._attrChangeTasks.length; i++) {
-        var changeTask = this._attrChangeTasks[i];
+        var currentChangeTask = this._attrChangeTasks[i];
         var aName = changeTask.attrName;
         if (aName === attrName) {
             this._attrChangeTasks.splice(i, 1);
@@ -261,10 +260,10 @@ Sprite_SoraAvgAnimate.prototype.addSpriteChangeTask = function (changeTask) {
                     this.setColorTone(tone);
                     break;
                 case "scaleX":
-                    this['scale']['x'] = from;
+                    this.scale.x = from;
                     break;
                 case "scaleY":
-                    this['scale']['y'] = from;
+                    this.scale.y = from;
                     break;
             }
             break;
@@ -367,22 +366,22 @@ Sora.SpriteCore.getInterpolatorByAbbr = function (abbr) {
 
 Sora.SpriteCore._LinearInterpolator = function (x) {
     return x;
-}
+};
 
 Sora.SpriteCore._SmoothStepInterpolator = function (x) {
     return x * x * (3.0 - 2.0 * x);
-}
+};
 
 Sora.SpriteCore._SpringInterpolator = function (x, f) {
     var factor = f || 0.4;
     return Math.pow(2, -10 * x) * Math.sin((x - factor / 4) * (2 * Math.PI) / factor) + 1;
-}
+};
 
 // Android
 
 Sora.SpriteCore._AccelerateDecelerateInterpolator = function (x) {
     return (Math.cos((x + 1) * Math.PI) / 2.0) + 0.5;
-}
+};
 
 Sora.SpriteCore._BounceInterpolator = function (x) {
 
@@ -398,7 +397,7 @@ Sora.SpriteCore._BounceInterpolator = function (x) {
     else
         result = bounce(x - 1.0435) + 0.95;
     return result;
-}
+};
 
 Sora.SpriteCore._AccelerateInterpolator = function (x, f) {
     var factor = f || 1.0;
@@ -406,16 +405,16 @@ Sora.SpriteCore._AccelerateInterpolator = function (x, f) {
         return x * x;
     else
         return Math.pow(x, 2.0 * factor);
-}
+};
 
 Sora.SpriteCore._AnticipateInterpolator = function (x, t) {
     var tension = t || 2.0;
     return x * x * ((tension + 1.0) * x - tension);
-}
+};
 
 Sora.SpriteCore._AnticipateOvershootInterpolator = function (x, t) {
     var tension = t || (2.0 * 1.5);
-
+    
     function a(t, s) { return t * t * ((s + 1) * t - s); }
     function o(t, s) { return t * t * ((s + 1) * t + s); }
 
@@ -423,12 +422,12 @@ Sora.SpriteCore._AnticipateOvershootInterpolator = function (x, t) {
         0.5 * a(x * 2.0, tension);
     else
         0.5 * (o(x * 2.0 - 2.0, tension) + 2.0);
-}
+};
 
 Sora.SpriteCore._CycleInterpolator = function (x, c) {
     var cycles = c || 1.0;
     return Math.sin(2.0 * cycles * Math.PI * x);
-}
+};
 
 Sora.SpriteCore._DecelerateInterpolator = function (x, f) {
     var factor = f || 1.0;
@@ -436,13 +435,13 @@ Sora.SpriteCore._DecelerateInterpolator = function (x, f) {
         return (1.0 - (1.0 - x) * (1.0 - x));
     else
         return (1.0 - Math.pow((1.0 - x), 2.0 * factor));
-}
+};
 
 Sora.SpriteCore._OvershootInterpolator = function (x, t) {
     var tension = t || 2.0;
     x -= 1.0;
     return x * x * ((tension + 1.0) * x + tension) + 1.0;
-}
+};
 
 // Advanced
 

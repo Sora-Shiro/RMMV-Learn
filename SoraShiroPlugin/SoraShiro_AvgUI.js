@@ -295,11 +295,11 @@ Sora.AvgUI.version = 1.00;
  * 立绘命名规范：
  * 统一按照 XX-000 即 [人名]-[编号] 的命名方式。
  * 
- * AvgUIRealToAbbr 参数说明：
+ * Real To Abbr 参数说明：
  * 一般在 AVG 中，当前说话的人会保持或恢复正常亮度，而其他人亮度会变暗，而手
  * 动处理这些动画较为繁琐，所以为了方便，在开发该插件时我增加了立绘亮度自动
  * 控制功能。
- * 通过 AvgUIRealToAbbr 参数将当前说话人名（RealName，从 NameBoxWindow 获得）
+ * 通过 Real To Abbr 参数将当前说话人名（RealName，从 NameBoxWindow 获得）
  * 和对应的图片系列（Abbr）绑定在一起，这样插件在显示姓名框的时候就能自动处
  * 理每个人的亮度。
  * 如 img 文件夹中有 "AL-000.png" 图片，表示 Alice 说话时的立绘之一，那么就
@@ -330,7 +330,7 @@ Sora.AvgUI.version = 1.00;
  * The standard of CG's name:
  * Use [name]-[number] like "Alice-000".
  * 
- * [AvgUIRealToAbbr] introduction:
+ * [Real To Abbr] introduction:
  * Normally, when we playing an AVG, the CG of people currently speaking
  * is brighter while others are darker, which means there are lots of 
  * animations to play. Obviously it is tedious to handle these animations,
@@ -338,7 +338,7 @@ Sora.AvgUI.version = 1.00;
  * By binding the current speaker's RealName(from YEP's NameBoxWindow) 
  * to the certain series of picture files, every CG's brightness will be
  * changed automatically while the Window_NameBox is showing.
- * Example: Write `{'Alice': "AL"}` to the [AvgUIRealToAbbr], which means when
+ * Example: Write `{'Alice': "AL"}` to the [Real To Abbr], which means when
  * Alice is speaking, all sprite in game screen, whose bitmap's 
  * source-picture-file-name-prefix is "AL", will be changed to or keep 
  * brighter while others will be darker.
@@ -812,7 +812,7 @@ Sora.AvgUI.showAvgPic = function (targetPath, targetX, targetId, interpolator, d
     targetSprite.bitmap = bitmap;
     var filePrefix = targetPath.split('-')[0];
     targetSprite._filePrefix = filePrefix;
-}
+};
 
 Sora.AvgUI.bringPicToFrontById = function (id) {
     var targetSpriteInfo = Sora.AvgUI.getPicFromPics(id);
@@ -832,7 +832,7 @@ Sora.AvgUI.hideAvgPic = function (id, interpolator, duration) {
     if (targetSpriteInfo === null) return;
     var targetSprite = targetSpriteInfo[0];
     targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('attr', 'opacity', 255, 0, interpolator, duration));
-}
+};
 
 Sora.AvgUI.getPicFromPics = function (id) {
     if (Sora.AvgUI.SoraAvgPictures === null) return null;
@@ -850,12 +850,12 @@ Sora.AvgUI.animateAvgCgSprite = function (id, animateType, duration) {
     if (targetSpriteInfo === null) return;
     var targetSprite = targetSpriteInfo[0];
     Sora.AvgUI.animateAvgSprite(targetSprite, animateType, duration);
-}
+};
 
 Sora.AvgUI.animateAvgBgSprite = function (animateType, duration) {
     var targetSprite = Sora.AvgUI.SoraAvgBg;
     Sora.AvgUI.animateAvgSprite(targetSprite, animateType, duration);
-}
+};
 
 Sora.AvgUI.animateAvgSprite = function (targetSprite, animateType, duration) {
     var ADInterpolator = Sora.SpriteCore.getInterpolatorByAbbr('AD');
@@ -893,7 +893,7 @@ Sora.AvgUI.animateAvgSprite = function (targetSprite, animateType, duration) {
             targetSprite.addSpriteChangeTask(Task_SpriteChange.createNoCallbackTask('method', "rgb", -68, 0, ADInterpolator, duration));
             break;
     }
-}
+};
 
 Sora.AvgUI.changeAvgCgBrightness = function (realName) {
     if (!Sora.Param.AvgUIAutoChangeBri) return;
@@ -921,7 +921,7 @@ Sora.AvgUI.changeAvgCgBrightness = function (realName) {
     if (frontIndex >= 0) {
         Sora.AvgUI.bringPicToFrontByIndex(frontIndex);
     }
-}
+};
 
 Sora.AvgUI.moveAvgPic = function (orientation, id, num) {
     orientation = orientation.toLocaleUpperCase();
@@ -946,7 +946,7 @@ Sora.AvgUI.moveAvgPic = function (orientation, id, num) {
     }
     children.splice(index, 1);
     children.splice(targetLayer, 0, targetSprite);
-}
+};
 
 //=============================================================================
 // New: Avg Menu Callback
@@ -976,7 +976,7 @@ Sora.AvgUI.callPlaybackScene = function () {
 
 Sora.AvgUI.saveData = function () {
     Sora.AvgUI.IfAnyData = true;
-}
+};
 
 Sora.AvgUI.Window_Message_isFastForward = Window_Message.prototype.isFastForward;
 Window_Message.prototype.isFastForward = function () {
@@ -1028,7 +1028,7 @@ Scene_Base.prototype.createSoraAvgObjects = function () {
     this.addChildAt(Sora.AvgUI.SoraAvgPictures, 2);
     this.addChildAt(Sora.AvgUI.SoraAvgWeather, 3);
     Sora.AvgUI.IfAnyData = false;
-}
+};
 
 //=============================================================================
 // Window_NameBox
@@ -1085,7 +1085,12 @@ Window_NameBox.prototype.processNormalCharacter = function (textState) {
 
 Window_NameBox.prototype.drawTextEx = function (text, x, y) {
     if (text) {
-        var textState = { index: 0, x: x, y: y, left: x };
+        var textState = {
+            index: 0,
+            x: x,
+            y: y,
+            left: x
+        };
         textState.text = this.convertEscapeCharacters(text);
         textState.height = this.calcTextHeight(textState, false);
         this.resetFontSettings();
@@ -1112,7 +1117,7 @@ Window_NameBox.prototype.setWindowBg = function () {
     transparentBg.paintOpacity = Sora.Param.AvgUINameBoxBgTransparent;
     transparentBg.blt(bgBitmap, 0, 0, bgBitmap.width, bgBitmap.height, 0, 0);
     this.setSoraBg(transparentBg);
-}
+};
 
 Window_NameBox.prototype.close = function () {
     Window_Base.prototype.close.call(this);
@@ -1191,7 +1196,7 @@ Window_Message.prototype.setSoraAvgMenu = function () {
     Sora.AvgUI.SoraAvgMenu = this._soraAvgMenu;
     this._soraAvgMenu.visible = false;
     this.addChild(this._soraAvgMenu);
-}
+};
 
 Window_Message.prototype.setSoraAvgMenuDetail = function () {
     var nothingBitmap = new Bitmap(1280, 720);
@@ -1246,7 +1251,7 @@ Window_Message.prototype.setSoraAvgMenuDetail = function () {
     this._soraAvgMenu.addChild(this._soraAvgMenuSave);
     this._soraAvgMenu.addChild(this._soraAvgMenuLoad);
     this._soraAvgMenu.addChild(this._soraAvgMenuPlayback);
-}
+};
 
 Window_Message.prototype.isTriggered = function () {
     if (this._soraAvgMenu.visible && this._soraAvgMenu.isButtonTouched()) {
@@ -1275,7 +1280,7 @@ Window_Message.prototype.setWindowBg = function () {
     transparentBg.paintOpacity = Sora.Param.AvgUIMessageBoxBgTransparent;
     transparentBg.blt(bgBitmap, 0, 0, bgBitmap.width, bgBitmap.height, 0, 0);
     this.setSoraBg(transparentBg);
-}
+};
 
 // 自动换行 Line Wrap
 // 参考 Reference：
@@ -1285,8 +1290,8 @@ Window_Message.prototype.processNormalCharacter = function (textState) {
     var w = this.textWidth(c);
 
     // New
-    var padding = Sora.Param.AvgUIMessageBoxPaddingLeft
-        + Sora.Param.AvgUIMessageBoxPaddingRight;
+    var padding = Sora.Param.AvgUIMessageBoxPaddingLeft +
+        Sora.Param.AvgUIMessageBoxPaddingRight;
     // Modified
     if (this.width - padding - textState.x >= w) {
 
@@ -1316,10 +1321,10 @@ Window_Message.prototype.processNewLine = function (textState) {
 Window_Base.prototype.processNewLine = function (textState) {
 
     // Modified
-    textState.x = textState.left
-        + Sora.Param.AvgUIMessageBoxPaddingLeft;
-    textState.y += textState.height
-        + Sora.Param.AvgUIMessageBoxRowSpacingShift;
+    textState.x = textState.left +
+        Sora.Param.AvgUIMessageBoxPaddingLeft;
+    textState.y += textState.height +
+        Sora.Param.AvgUIMessageBoxRowSpacingShift;
 
     textState.height = this.calcTextHeight(textState, false);
     textState.index++;
@@ -1328,8 +1333,8 @@ Window_Base.prototype.processNewLine = function (textState) {
 Window_Message.prototype.needsNewPage = function (textState) {
     // Modified
     var padding = Sora.Param.AvgUIMessageBoxPaddingBottom;
-    var totalRowSpacing = (this._soraLine - 1)
-        * Sora.Param.AvgUIMessageBoxRowSpacingShift;
+    var totalRowSpacing = (this._soraLine - 1) *
+        Sora.Param.AvgUIMessageBoxRowSpacingShift;
     return (!this.isEndOfText(textState) &&
         textState.y + textState.height + padding > this.contents.height);
 };
@@ -1341,10 +1346,10 @@ Window_Message.prototype.newPage = function (textState) {
     this.loadMessageFace();
 
     // Modified
-    textState.x = this.newLineX()
-        + Sora.Param.AvgUIMessageBoxPaddingLeft;
-    textState.y = this.newLineY()
-        + Sora.Param.AvgUIMessageBoxPaddingTop;
+    textState.x = this.newLineX() +
+        Sora.Param.AvgUIMessageBoxPaddingLeft;
+    textState.y = this.newLineY() +
+        Sora.Param.AvgUIMessageBoxPaddingTop;
     this.setWindowBg();
     if (textState.index === 0) {
         this._soraLine = 1;
