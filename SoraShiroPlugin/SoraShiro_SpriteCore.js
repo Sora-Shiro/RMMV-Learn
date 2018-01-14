@@ -9,23 +9,28 @@ Sora.SpriteCore.version = 1.00;
 
 //=============================================================================
 /*:
-* @plugindesc v1.00 Sprite Core
-* @author Sora Shiro
-* 
-* @help
-* ============================================================================
-* Introduction
-* ============================================================================
-*
-* Sprite core code.
-*
-* ============================================================================
-* Changelog
-* ============================================================================
-*
-* Version 1.00:
-* - Finish
-*/
+ * @plugindesc v1.00 核心代码：Sprite Core
+ * @author Sora Shiro
+ * 
+ * @help
+ * ============================================================================
+ * Introduction
+ * ============================================================================
+ *
+ * Sprite core code.
+ * 
+ * Now support:
+ * - Sprite_SoraAvgAnimate
+ * - Task_SpriteChange
+ * - Animation Interpolator
+ *
+ * ============================================================================
+ * Changelog
+ * ============================================================================
+ *
+ * Version 1.00:
+ * - Finish
+ */
 //=============================================================================
 
 //=============================================================================
@@ -66,7 +71,7 @@ Sprite_SoraAvgAnimate.prototype.updateAnimation = function () {
         changeTask.ticker++;
         var ticker = changeTask.ticker;
         ticker = ticker - changeTask.pre;
-        if(ticker <= 0) continue;
+        if (ticker <= 0) continue;
         if (ticker > duration) {
             this._attrChangeTasks.splice(i, 1);
             var task = changeTask;
@@ -385,7 +390,9 @@ Sora.SpriteCore._AccelerateDecelerateInterpolator = function (x) {
 
 Sora.SpriteCore._BounceInterpolator = function (x) {
 
-    function bounce(t) { return t * t * 8; }
+    function bounce(t) {
+        return t * t * 8;
+    }
 
     var result;
     if (x < 0.3535)
@@ -414,9 +421,14 @@ Sora.SpriteCore._AnticipateInterpolator = function (x, t) {
 
 Sora.SpriteCore._AnticipateOvershootInterpolator = function (x, t) {
     var tension = t || (2.0 * 1.5);
-    
-    function a(t, s) { return t * t * ((s + 1) * t - s); }
-    function o(t, s) { return t * t * ((s + 1) * t + s); }
+
+    function a(t, s) {
+        return t * t * ((s + 1) * t - s);
+    }
+
+    function o(t, s) {
+        return t * t * ((s + 1) * t + s);
+    }
 
     if (x < 0.5)
         0.5 * a(x * 2.0, tension);
@@ -456,10 +468,10 @@ Sora.SpriteCore._CubicHermiteInterpolator = function (x, p_0, p_1, m_0, m_1) {
     function CubicHermite(t, p0, p1, m0, m1) {
         t2 = t * t;
         t3 = t2 * t;
-        return (2.0 * t3 - 3.0 * t2 + 1.0) * p0
-            + (t3 - 2.0 * t2 + t) * m0
-            + (-2.0 * t3 + 3.0 * t2) * p1
-            + (t3 - t2) * m1;
+        return (2.0 * t3 - 3.0 * t2 + 1.0) * p0 +
+            (t3 - 2.0 * t2 + t) * m0 +
+            (-2.0 * t3 + 3.0 * t2) * p1 +
+            (t3 - t2) * m1;
     }
 
     //time, start, end, tangent0, tangent1

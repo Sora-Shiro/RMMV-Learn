@@ -583,7 +583,7 @@ ImageManager.loadAvgUI = function (filename, hue) {
     return this.loadBitmap(path, filename, hue, true);
 };
 
-Sora.AvgUI.ImgPath = ['name', 'talk-00', 'talkmenu'];
+Sora.AvgUI.ImgPath = [Sora.Param.AvgUINameBoxBg, Sora.Param.AvgUIMessageBoxBg, Sora.Param.AvgUIMenuBg];
 Sora.AvgUI.isAvgMode = false;
 
 // Preload
@@ -1488,12 +1488,13 @@ Window_Base.prototype.initialize = function (x, y, width, height) {
 };
 
 Window_Base.prototype.setSoraBg = function (bitmap) {
-    this._bgSprite.bitmap = bitmap;
+    this._bgSoraSprite.bitmap = bitmap;
 };
 
 Window_Base.prototype.createSoraBg = function (bitmap) {
-    this._bgSprite = new Sprite();
-    this.addChildAt(this._bgSprite, 0);
+    var nothingBitmap = new Bitmap(1280, 720);
+    this._bgSoraSprite = new Sprite_SoraAvgAnimate(nothingBitmap);
+    this.addChildAt(this._bgSoraSprite, 0);
 };
 
 Window_Base.prototype.update = function () {
