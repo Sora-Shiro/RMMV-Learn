@@ -630,6 +630,11 @@ Game_Interpreter.prototype.pluginCommand = function (command, args) {
 Game_Interpreter.prototype.startSoraAvgMode = function (args) {
     Sora.AvgUI.isAvgMode = true;
 
+    // Show all
+    Sora.AvgUI.SoraAvgBg.visible = true;
+    Sora.AvgUI.SoraAvgPictures.visible = true;
+    Sora.AvgUI.SoraAvgWeather.visible = true;
+
     // Show menu
     Sora.AvgUI.SoraAvgMenu.visible = true;
 };
@@ -645,6 +650,20 @@ Game_Interpreter.prototype.stopSoraAvgMode = function (args) {
     var soraAvgPics = Sora.AvgUI.SoraAvgPictures;
     var avgPicsChildren = soraAvgPics.children;
     avgPicsChildren.splice(0, avgPicsChildren.length);
+
+    // Hide all
+    var interpolatorAbbr = args[0] || "AD";
+    var interpolator = Sora.SpriteCore.getInterpolatorByAbbr(interpolatorAbbr);
+    var duration = Number(args[1]) || 30;
+    var soraAvgBg = Sora.AvgUI.SoraAvgBg;
+    var task = Task_SpriteChange.createNoCallbackTask(
+        'attr', 'opacity', 255, 0, interpolator, duration);
+    task.finishCallback = function () {
+        Sora.AvgUI.SoraAvgBg.visible = false;
+    };
+    soraAvgBg.addSpriteChangeTask(task);
+    Sora.AvgUI.SoraAvgPictures.visible = false;
+    Sora.AvgUI.SoraAvgWeather.visible = false;
 
     // Hide menu
     Sora.AvgUI.SoraAvgMenu.visible = false;
@@ -1012,11 +1031,14 @@ Scene_Base.prototype.createSoraAvgObjects = function () {
         Sora.AvgUI.SoraAvgMenu.visible = true;
         Sora.AvgUI.SoraAvgPauseIcon.visible = false;
     } else {
-        var nothingBitmap = new Bitmap(1280, 720);
+        var nothingBitmap = new Bitmap(0, 0);
 
         this._soraAvgBg = new Sprite_SoraAvgAnimate(nothingBitmap);
         this._soraAvgPictures = new Sprite_SoraAvgAnimate(nothingBitmap);
         this._soraAvgWeather = new Sprite_SoraAvgAnimate(nothingBitmap);
+        this._soraAvgBg.visible = false;
+        this._soraAvgPictures.visible = false;
+        this._soraAvgWeather.visible = false;
 
         Sora.AvgUI.SoraAvgBg = this._soraAvgBg;
         Sora.AvgUI.SoraAvgPictures = this._soraAvgPictures;
@@ -1197,7 +1219,7 @@ Window_Message.prototype.setSoraAvgMenu = function () {
 };
 
 Window_Message.prototype.setSoraAvgMenuDetail = function () {
-    var nothingBitmap = new Bitmap(1280, 720);
+    var nothingBitmap = new Bitmap(0, 0);
 
     var height = Sora.Param.AvgUIMenuHeight;
     if (Sora.Param.AvgUIMenuAutoHeight) {
@@ -1393,10 +1415,21 @@ Window_Message.prototype.standardPadding = function () {
 Sora.AvgUI.Window_Message_update = Window_Message.prototype.update;
 Window_Message.prototype.update = function () {
     Sora.AvgUI.Window_Message_update.call(this);
-    this.width = Sora.Param.AvgUIMessageBoxWidth;
-    this.height = Sora.Param.AvgUIMessageBoxHeight;
-    this.x = 0;
-    this.y = SceneManager._boxHeight - this.height;
+    // 注意不能一直修改这些值，否则会很卡
+    // Noted that these values shouldn't be changed frequently,
+    // or there will be a bad performance
+    if (this.width !== Sora.Param.AvgUIMessageBoxWidth) {
+        this.width = Sora.Param.AvgUIMessageBoxWidth;
+    }
+    if (this.height !== Sora.Param.AvgUIMessageBoxHeight) {
+        this.height = Sora.Param.AvgUIMessageBoxHeight;
+    }
+    if (this.x !== 0) {
+        this.x = 0;
+    }
+    if (this.y !== (SceneManager._boxHeight - this.height)) {
+        this.y = SceneManager._boxHeight - this.height;
+    }
     this._soraAvgPauseIcon.visible = this._soraPause;
     this._soraAvgMenu.visible = Sora.Param.AvgUIMenuEnable;
 };
@@ -1490,7 +1523,7 @@ Window_Base.prototype.setSoraBg = function (bitmap) {
 };
 
 Window_Base.prototype.createSoraBg = function (bitmap) {
-    var nothingBitmap = new Bitmap(1280, 720);
+    var nothingBitmap = new Bitmap(0, 0);
     this._bgSoraSprite = new Sprite_SoraAvgAnimate(nothingBitmap);
     this.addChildAt(this._bgSoraSprite, 0);
 };
